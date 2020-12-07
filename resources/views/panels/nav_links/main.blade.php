@@ -8,7 +8,7 @@
 </ul>
 @if (Auth::check())
   <div class="btn-group ml-auto" role="group" aria-label="Управление аккаунтом">
-    <a class="btn btn-outline-light disabled">{{ Auth::user()->name }}</a>
+    <a class="btn btn-light disabled">{{ Auth::user()->name }}</a>
     <a class="btn btn-outline-light" href="{{ route('logout') }}">Выйти</a>
   </div>
 @else

@@ -9,6 +9,8 @@
 
 @section('content')
 <?php
+  $is_moderator = Auth::check() && Auth::user()->role !== 'user';
+
   if ($id != null) {
     $path_str = $current->type == 'catalog' ? $current->name : "";
     foreach ($path as $parent) {
@@ -46,6 +48,18 @@
   }
 ?>
 <div id="forum">
+  @if($errors->any())
+    <div class="alert alert-danger mb-2 alert-dismissible">
+      <ul>
+        @foreach($errors->all() as $error)
+            <li>{{$error}}</li>
+        @endforeach
+      </ul>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  @endif
   @if($type == 'catalog')
     <h3>Форум</h3>
     <table class="table">
@@ -86,7 +100,7 @@
         @if(Auth::check() && $editable)
           <tr>
             <td colspan=3>
-              <a class="btn btn-light" href="{{route('forum.add-post-form', $id)}}">Добавить пост</a>
+              <a class="btn btn-light" href="{{route('forum.add-post-form', $id == null ? 0 : $id)}}">Добавить пост</a>
             </td>
           </tr>
         @endif
@@ -107,8 +121,8 @@
       <hr />
       <p class="text-justify"><?php echo text_to_html($current->text); ?></p>
       <div class="text-right" data-id="{{$current->id}}">
-        @if(Auth::check() && isAuthor($current->user_id))
-          <i class="fas fa-times btn btn-light ml-auto" title="Удалить" data-toggle="modal" data-target="#deletePostModal"></i>
+        @if(Auth::check() && (isAuthor($current->user_id) || $is_moderator))
+          <i class="fas fa-times btn btn-light ml-auto{{ !isAuthor($current->user_id) && $is_moderator ? ' red' : '' }}" title="Удалить" data-toggle="modal" data-target="#deletePostModal"></i>
           <div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content">
@@ -133,7 +147,7 @@
       </div>
       <hr />
       <?php
-        function printComments($list) {
+        function printComments($list, $is_moderator) {
           global $auth;
           foreach ($list as $comment) {
             ?>
@@ -158,8 +172,8 @@
                       @endif
                     </div>
                     <div class="ml-auto">
-                      @if(Auth::check() && isAuthor($comment['comment']['user_id']))
-                        <i class="fas fa-times btn btn-light ml-auto" data-id="{{$comment['comment']['id']}}" data-action="delete" title="Удалить" data-toggle="modal" data-target="#deleteModal"></i>
+                      @if(Auth::check() && (isAuthor($comment['comment']['user_id']) || $is_moderator))
+                        <i class="fas fa-times btn btn-light ml-auto{{ !isAuthor($comment['comment']['user_id']) && $is_moderator ? ' red' : '' }}" data-id="{{$comment['comment']['id']}}" data-action="delete" title="Удалить" data-toggle="modal" data-target="#deleteModal"></i>
                       @endif
                     </div>
                     <div>
@@ -168,7 +182,7 @@
                   </div>
                   @endif
                 </div>
-              {{printComments($comment['childs'])}}
+              {{printComments($comment['childs'], $is_moderator)}}
               <div class="comment_box" id="reply{{$comment['comment']['id']}}" hidden>
               </div>
             </div>
@@ -179,7 +193,7 @@
         if (count($posts) == 0) {
           echo "<p>Комментариев нет</p>";
         } else {
-          printComments($posts);
+          printComments($posts, $is_moderator);
         }
       ?>
       @if(Auth::check())
@@ -187,7 +201,7 @@
         <div id="reply{{$id}}" hidden>
           <form id="write_comment" class="comment" method="post" action="{{route('forum.add-comment')}}">
             @csrf
-            <textarea id="comment_area" class="form-control" name="text" placeholder="Введите комментарий"></textarea>
+            <textarea id="comment_area" class="form-control" name="text" placeholder="Введите комментарий" required></textarea>
             <input type="hidden" name="id" id="reply_id" value="{{$id}}" />
             <input type="submit" class="btn btn-light" value="Отправить" />
             <i class="fas fa-times btn btn-light" data-id=0 data-action="close" title="Закрыть"></i>
