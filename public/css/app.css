@@ -11,11 +11,13 @@ body {
   height: 32px;
 }
 
-.btn {
-  border-radius: 0;
-}
-
 li {
   list-style-type: none;
+}
+
+.form-login .form-group {
+  width: 100%;
+  max-width: 350px;
+  margin-right: auto;
 }
 
