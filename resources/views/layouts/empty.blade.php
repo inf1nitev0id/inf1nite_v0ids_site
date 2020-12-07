@@ -16,18 +16,16 @@
     @yield('head')
   </head>
   <body>
-    @include('panels.nav_links.main')
-    <div class="container flex-fill">
-      <div class="row">
-        <div class="col-xs-12 col-md-3 p-xs-0">
-          <div>
-            @include('panels.subnav')
-          </div>
-        </div>
-        <div class="col-xs-12 col-md-9 order-md-first mt-3 text-justify">
-          @yield('content')
-        </div>
+    <nav class="navbar navbar-expand navbar-light">
+      <a class="navbar-brand" href="{{ route('home') }}"><img src="/logo.png" class="logo" /> inf1nite_v0id</a>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link" href="{{ route(($from !== 'main' ? $from.'.' : '').'home') }}">Главная</a></li>
+        </ul>
       </div>
+    </nav>
+    <div class="flex-fill form-center">
+      @yield('content')
     </div>
     @include('panels.footer')
   </body>

@@ -15,9 +15,26 @@ li {
   list-style-type: none;
 }
 
-.form-login .form-group {
+.form-login {
   width: 100%;
   max-width: 350px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.form-login .form-group {
   margin-right: auto;
+}
+
+.form-center {
+  display: flex;
+  -ms-flex-align: center;
+  -ms-flex-pack: center;
+  align-items: center;
+  justify-content: center;
+}
+
+[v-cloak] {
+  display: none;
 }
 

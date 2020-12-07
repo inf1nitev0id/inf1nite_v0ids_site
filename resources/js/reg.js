@@ -1,5 +1,3 @@
-window.Vue = require('vue');
-
 window.onload = function () {
   const reg_form = new Vue({
     el: '#reg',

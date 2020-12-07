@@ -1,31 +1,16 @@
-@extends('layouts.main')
+@extends('layouts.empty')
 
 @section('title') Регистрация @endsection
 
 @section('head')
+<script src="/js/vue.js"></script>
 <script src="/js/reg.js"></script>
 @endsection
 
 @section('content')
-@if($errors->any())
-  <div class="alert alert-danger mb-2 alert-dismissible">
-    <ul>
-      @foreach($errors->all() as $error)
-          <li>{{$error}}</li>
-      @endforeach
-    </ul>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-@endif
 <form id="reg" @submit="checkForm" class="form-login" method="POST" action="{{ route('register') }}">
-  <div v-if="errors.length" class="alert alert-danger mb-2">
-    <ul>
-      <li v-for="error in errors">@{{ error }}</li>
-    </ul>
-  </div>
   @CSRF
+  <input type="hidden" name="from" value="{{ $from }}" />
   <div class="form-group">
     <label for="login-input">Имя пользователя</label>
     <input id="login-input" type="text" class="form-control" name="login" v-model="login" placeholder="Введите имя пользователя" required />
@@ -46,7 +31,27 @@
     <input id="invite-input" type="text" class="form-control" name="invite" v-model="invite" placeholder="Введите код" required />
   </div>
   <div class="form-group">
-    <input class="btn btn-dark" type="submit" value="Зарегистрироваться" />
+    <div class="btn-group btn-block ml-auto" role="group" aria-label="Вход/Регистрация">
+      <input class="btn btn-dark" type="submit" value="Зарегистрироваться" />
+      <a class="btn btn-outline-dark" href="{{ route(($from !== 'main' ? $from.'.' : '').'login') }}">Вход</a>
+    </div>
+  </div>
+  @if($errors->any())
+    <div class="alert alert-danger mb-2 alert-dismissible">
+      <ul>
+        @foreach($errors->all() as $error)
+            <li>{{$error}}</li>
+        @endforeach
+      </ul>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  @endif
+  <div v-cloak v-if="errors.length" class="alert alert-danger mb-2">
+    <ul>
+      <li v-for="error in errors">@{{ error }}</li>
+    </ul>
   </div>
 </form>
 @endsection

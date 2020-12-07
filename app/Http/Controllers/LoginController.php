@@ -10,15 +10,22 @@ use App\Models\Invite;
 
 class LoginController extends Controller
 {
+  public static function getFrom($from) {
+    switch ($from) {
+      case 'mahouka':
+        return route('mahouka.home');
+      default:
+        return route('home');
+    }
+  }
+
   public function authenticate(Request $request)
   {
-    if (Auth::attempt(['email' => $request->login, 'password' => $request->password], $request->rememberme)) {
-      return redirect()->intended(route('home'));
-    } else if (Auth::attempt(['name' => $request->login, 'password' => $request->password], $request->rememberme)) {
-      return redirect()->intended(route('home'));
-    } else {
+    if (!Auth::attempt(['email' => $request->login, 'password' => $request->password], $request->rememberme) &&
+        !Auth::attempt(['name' => $request->login, 'password' => $request->password], $request->rememberme)) {
       return redirect()->back()->with('authError', "Неправильные логин или пароль.");
     }
+    return redirect()->intended($this->getFrom($request->from));
   }
 
   public function register(Request $request) {
@@ -67,6 +74,6 @@ class LoginController extends Controller
     $user->save();
     Auth::loginUsingId($user->id);
 
-    return redirect()->intended(route('home'));
+    return redirect()->intended($this->getFrom($request->from));
   }
 }

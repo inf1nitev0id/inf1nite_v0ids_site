@@ -1,5 +1,8 @@
 {
     "/js/app.js": "/js/app.js",
+    "/css/mahouka.css": "/css/mahouka.css",
+    "/css/forum.css": "/css/forum.css",
     "/css/app.css": "/css/app.css",
-    "/js/reg.js": "/js/reg.js"
+    "/js/reg.js": "/js/reg.js",
+    "/js/vue.js": "/js/vue.js"
 }

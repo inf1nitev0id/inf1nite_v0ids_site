@@ -13,21 +13,13 @@
     <script src="https://kit.fontawesome.com/1b4ab6ba30.js" crossorigin="anonymous"></script>
     <script src="/js/app.js"></script>
     <link rel="stylesheet" href="/css/app.css" />
+    <link rel="stylesheet" href="/css/mahouka.css" />
     @yield('head')
   </head>
   <body>
-    @include('panels.nav_links.main')
-    <div class="container flex-fill">
-      <div class="row">
-        <div class="col-xs-12 col-md-3 p-xs-0">
-          <div>
-            @include('panels.subnav')
-          </div>
-        </div>
-        <div class="col-xs-12 col-md-9 order-md-first mt-3 text-justify">
-          @yield('content')
-        </div>
-      </div>
+    @include('panels.nav_links.mahouka')
+    <div class="container flex-fill mt-3 text-justify">
+      @yield('content')
     </div>
     @include('panels.footer')
   </body>
