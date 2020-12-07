@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ForumController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,16 @@ Route::get('/logout', function() {
   Auth::logout();
   return back();
 })->name('logout')->middleware('auth');
+
+Route::get('/forum/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name("forum");
+Route::prefix('forum')->name('forum.')->group(function() {
+  Route::post('/add-comment', [ForumController::class, 'addComment'])->name("add-comment");
+  Route::post('/delete-comment', [ForumController::class, 'deleteComment'])->name("delete-comment");
+
+  Route::get('/{id}/add-post', [ForumController::class, 'addPostForm'])->name("add-post-form");
+  Route::post('/add-post', [ForumController::class, 'addPost'])->name("add-post");
+  Route::post('/delete-post', [ForumController::class, 'deletePost'])->name("delete-post");
+});
 
 Route::prefix('mahouka')->name('mahouka.')->group(function() {
   Route::get('/', function() {

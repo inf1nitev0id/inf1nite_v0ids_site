@@ -3,6 +3,7 @@
 @section('title') Регистрация @endsection
 
 @section('head')
+<script src="/js/vue.js"></script>
 <script src="/js/reg.js"></script>
 @endsection
 
