@@ -22,12 +22,12 @@ Route::get('/about', function () {
 })->name('about');
 
 Route::get('/reg', function() {
-  return view('reg');
+  return view('auth.reg', ['from' => 'main']);
 })->name('reg')->middleware('guest');
 Route::post('/register', [LoginController::class, 'register'])
   ->name('register')->middleware('guest');
 Route::get('/login', function() {
-  return view('login');
+  return view('auth.login', ['from' => 'main']);
 })->name('login')->middleware('guest');
 Route::post('/auth', [LoginController::class, 'authenticate'])
   ->name('auth')->middleware('guest');
@@ -35,3 +35,19 @@ Route::get('/logout', function() {
   Auth::logout();
   return back();
 })->name('logout')->middleware('auth');
+
+Route::prefix('mahouka')->name('mahouka.')->group(function() {
+  Route::get('/', function() {
+    return view('mahouka.home');
+  })->name('home');
+  Route::get('/top', function() {
+    return view('mahouka.top');
+  })->name('top');
+
+  Route::get('/reg', function() {
+    return view('auth.reg', ['from' => 'mahouka']);
+  })->name('reg')->middleware('guest');
+  Route::get('/login', function() {
+    return view('auth.login', ['from' => 'mahouka']);
+  })->name('login')->middleware('guest');
+});

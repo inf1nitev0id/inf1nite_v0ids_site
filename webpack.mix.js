@@ -13,4 +13,5 @@ const mix = require('laravel-mix');
 
 mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/reg.js', 'public/js')
+    .sass('resources/sass/mahouka.scss', 'public/css')
     .sass('resources/sass/app.scss', 'public/css');
