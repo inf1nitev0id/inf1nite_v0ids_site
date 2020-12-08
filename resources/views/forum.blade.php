@@ -161,7 +161,7 @@
                     <a href="#{{$comment['comment']['id']}}">#</a>
                   </div>
                 @endif
-                <div class="comment" id="comment_text{{$comment['comment']['id']}}">
+                <div class="comment comment-body" id="comment_text{{$comment['comment']['id']}}">
                   <?php echo $comment['comment']['deleted'] ? "<span class=\"text-muted\">КОММЕНТАРИЙ УДАЛЁН</span>" : text_to_html($comment['comment']['text']); ?>
                 </div>
                 @if (!$comment['comment']['deleted'])
