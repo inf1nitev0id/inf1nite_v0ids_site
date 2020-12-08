@@ -15,15 +15,18 @@ li {
   list-style-type: none;
 }
 
-.form-login {
+form {
   width: 100%;
   max-width: 350px;
-  margin: 0 auto;
   text-align: left;
 }
 
-.form-login .form-group {
+form .form-group {
   margin-right: auto;
+}
+
+.form-login {
+  margin: 0 auto;
 }
 
 .form-center {
