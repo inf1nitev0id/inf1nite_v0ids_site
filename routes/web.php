@@ -60,6 +60,7 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
     })->name('load');
     Route::post('/load', [MahoukaServerRatingController::class, 'preload'])->name('preload');
     Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
+    Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
   });
 
   Route::get('/reg', function() {

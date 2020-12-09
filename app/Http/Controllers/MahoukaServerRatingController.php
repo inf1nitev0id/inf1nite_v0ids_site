@@ -243,6 +243,28 @@ class MahoukaServerRatingController extends Controller
     return redirect()->back();
   }
 
+  public function write_rate(Request $request) {
+    $array = $request->all();
+    foreach ($array as $key => $value) {
+      if (is_int($key)) {
+        $record = MahoukaServerRating::where([
+          ['user_id', '=', $key],
+          ['date', '=', $request->date],
+          ['time', '=', $request->time]
+        ])->first();
+        if (!$record) {
+          $record = new MahoukaServerRating;
+          $record->user_id = $key;
+          $record->date = $request->date;
+          $record->time = $request->time;
+        }
+        $record->rate = $value;
+        $record->save();
+      }
+    }
+    return redirect()->route('mahouka.top.load');
+  }
+
   public function top() {
     $sorted_users = MahoukaServerUser::getSortedUsers();
     $rating = [];

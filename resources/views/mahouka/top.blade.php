@@ -7,13 +7,13 @@
 <div class="overflow">
   <table class="container-fluid">
     <tr>
-      <th></th>
+      <th colspan=2></th>
       @foreach($sorted_users as $user)
       	<th nowrap>{{ $user['name'] }}</th>
       @endforeach
     </tr>
     @for ($date = $min_date; $date <= $max_date; $date->add($step))
-      <tr class="border-top">
+      <tr>
         <?php
           $line1 = "";
           $line2 = "";
@@ -23,10 +23,12 @@
             $line2 .= "<td>".($rating_table[$user['id']][$d][1] ?? '')."</td>";
           }
         ?>
-        <td rowspan=2>{{ $date->format('Y-m-d') }}</td>
+        <th rowspan=2>{{ $date->format('Y-m-d') }}</th>
+        <th>Утро</th>
         <?php echo $line1; ?>
       </tr>
       <tr>
+        <th>Вечер</th>
         <?php echo $line2; ?>
       </tr>
     @endfor

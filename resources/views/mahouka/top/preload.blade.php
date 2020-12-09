@@ -11,8 +11,10 @@
       Дата: {{ $date }}<br />
       Время: {{ $time ? 'Вечер' : 'Утро' }}
     </p>
-    <form method="post" action="{{ route('mahouka.top.load') }}">
+    <form method="post" action="{{ route('mahouka.top.write-rate') }}">
       @csrf
+      <input type="hidden" name="date" value="{{ $date }}" />
+      <input type="hidden" name="time" value="{{ $time }}" />
       <table>
         <tr>
           <th colspan="2">Готово к записи</th>
@@ -23,7 +25,7 @@
               {{ $user['name'] }}
             </td>
             <td>
-              <input type="number" readonly name="{{ $user['id'] }}" value="{{ $user['rate'] }}" />
+              <input type="text" readonly name="{{ $user['id'] }}" value="{{ $user['rate'] }}" />
             </td>
           </tr>
         @endforeach

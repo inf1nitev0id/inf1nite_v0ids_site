@@ -41,14 +41,23 @@ form .form-group {
   overflow-x: scroll;
 }
 
-table tr,
+table td,
 table th {
   padding-left: 5px;
   padding-right: 5px;
 }
 
-.border-top {
+table td:not(:last-child),
+table th:not(:last-child) {
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+table tr:not(:first-child):nth-child(odd) {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+table tr:not(:first-child):nth-child(even) {
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 [v-cloak] {

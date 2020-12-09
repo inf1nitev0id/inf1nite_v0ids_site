@@ -45,14 +45,21 @@ form {
 }
 
 table {
-  tr, th {
+  td, th {
     padding-left: 5px;
     padding-right: 5px;
+    &:not(:last-child) {
+      border-right: 1px solid rgba(0, 0, 0, 0.2);
+    }
   }
-}
-
-.border-top {
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  tr:not(:first-child) {
+    &:nth-child(odd) {
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    &:nth-child(even) {
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  }
 }
 
 [v-cloak] { display: none; }
