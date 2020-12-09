@@ -11,17 +11,31 @@
       Дата: {{ $date }}<br />
       Время: {{ $time ? 'Вечер' : 'Утро' }}
     </p>
-    <table>
-      <tr>
-        <th colspan="2">Готово к записи</th>
-      </tr>
-      @foreach ($users as $user)
+    <form method="post" action="{{ route('mahouka.top.load') }}">
+      @csrf
+      <table>
         <tr>
-          <td>{{ $user['name'] }}</td>
-          <td>{{ $user['rate'] }}</td>
+          <th colspan="2">Готово к записи</th>
         </tr>
-      @endforeach
-    </table>
+        @foreach ($users as $user)
+          <tr>
+            <td>
+              {{ $user['name'] }}
+            </td>
+            <td>
+              <input type="number" readonly name="{{ $user['id'] }}" value="{{ $user['rate'] }}" />
+            </td>
+          </tr>
+        @endforeach
+        @if ($users)
+          <tr>
+            <th colspan="2">
+              <input type="submit" value="Записать рейтинг" />
+            </th>
+          </tr>
+        @endif
+      </table>
+    </form>
   </div>
   <form class="col-xs-12 col-md-6" method="post" action="{{ route('mahouka.top.load-hashes') }}">
     @csrf

@@ -242,4 +242,19 @@ class MahoukaServerRatingController extends Controller
     }
     return redirect()->back();
   }
+
+  public function top() {
+    $sorted_users = MahoukaServerUser::getSortedUsers();
+    $rating = [];
+    foreach ($sorted_users as $user) {
+      $rating[$user['id']] = MahoukaServerRating::getUserRatingArray($user['id']);
+    }
+    return view('mahouka.top', [
+      'sorted_users' => $sorted_users,
+      'min_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMinDate()),
+      'max_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMaxDate()),
+      'step' => new \DateInterval('P1D'),
+      'rating_table' => $rating
+    ]);
+  }
 }

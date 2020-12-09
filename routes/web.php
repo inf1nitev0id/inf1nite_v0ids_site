@@ -53,9 +53,7 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
     return view('mahouka.home');
   })->name('home');
 
-  Route::get('/top', function() {
-    return view('mahouka.top');
-  })->name('top');
+  Route::get('/top', [MahoukaServerRatingController::class, 'top'])->name('top');
   Route::prefix('top')->name('top.')->middleware('role:admin')->group(function() {
     Route::get('/load', function() {
       return view('mahouka.top.load');
