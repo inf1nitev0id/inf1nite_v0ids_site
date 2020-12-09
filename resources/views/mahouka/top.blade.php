@@ -5,7 +5,7 @@
 @section('content')
 <h5>Рейтинг сервера</h5>
 <div class="overflow">
-  <table class="container-fluid">
+  <table class="container-fluid rating">
     <tr>
       <th colspan=2></th>
       @foreach($sorted_users as $user)
