@@ -1,10 +1,6 @@
 /node_modules
 /public/hot
 /public/storage
-/public/css
-/public/js/app.js
-/public/js/vue.js
-/public/js/reg.js
 /public/mix-manifest.json
 /storage/*.key
 /vendor

@@ -1,0 +1,68 @@
+.comment_box {
+  width: 100%;
+  padding-top: 10px;
+}
+
+.comment_box > .comment_box {
+  padding-left: 20px;
+}
+
+.comment {
+  padding: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+  border-bottom: 0;
+}
+
+.comment-footer {
+  border-top: 0;
+  padding: 0;
+}
+
+.highlight {
+  -webkit-animation-name: highlight;
+          animation-name: highlight;
+  -webkit-animation-duration: 5s;
+          animation-duration: 5s;
+  -webkit-animation-iteration-count: 1;
+          animation-iteration-count: 1;
+}
+
+@-webkit-keyframes highlight {
+  from {
+    box-shadow: 0 0 10px gray;
+  }
+
+  90% {
+    box-shadow: 0 0 10px gray;
+  }
+
+  to {
+    box-shadow: 0;
+  }
+}
+
+@keyframes highlight {
+  from {
+    box-shadow: 0 0 10px gray;
+  }
+
+  90% {
+    box-shadow: 0 0 10px gray;
+  }
+
+  to {
+    box-shadow: 0;
+  }
+}
+
+.rating {
+  line-height: 1;
+}
+
+.red {
+  color: #FF0000;
+}
+

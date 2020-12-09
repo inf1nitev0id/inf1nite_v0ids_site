@@ -13,6 +13,8 @@ return [
   'size' => [
     'string' => 'Поле ":attribute" должно состоять из :size символов.',
   ],
+  'url' => 'Формат :attribute неверный.',
+  'date' => 'Поле ":attribute" содержит неправильную дату.',
 
   'attributes' => [
     'login' => 'Логин',
@@ -21,6 +23,9 @@ return [
     'password-repeat' => 'Повтор пароля',
     'title' => 'Заголовок',
     'text' => 'Текст',
-    'invite' => 'Код приглашения'
+    'invite' => 'Код приглашения',
+    'url' => 'URL',
+    'date' => 'Дата',
+    'time' => 'Время'
   ],
 ];

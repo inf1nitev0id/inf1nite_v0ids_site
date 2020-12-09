@@ -180,8 +180,8 @@
                       {{printRating($comment['comment']['id'], $comment['comment']['rating'], $comment['comment']['user_id'])}}
                     </div>
                   </div>
-                  @endif
-                </div>
+                @endif
+              </div>
               {{printComments($comment['childs'], $is_moderator)}}
               <div class="comment_box" id="reply{{$comment['comment']['id']}}" hidden>
               </div>

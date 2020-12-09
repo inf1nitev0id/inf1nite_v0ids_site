@@ -15,15 +15,17 @@ li {
   list-style-type: none;
 }
 
-.form-login {
+form {
   width: 100%;
   max-width: 350px;
-  margin: 0 auto;
   text-align: left;
 
   .form-group {
     margin-right: auto;
   }
+}
+.form-login {
+  margin: 0 auto;
 }
 
 .form-center {
@@ -36,6 +38,28 @@ li {
   align-items: center;
   -webkit-box-pack: center;
   justify-content: center;
+}
+
+.overflow {
+  overflow-x: scroll;
+}
+
+table {
+  td, th {
+    padding-left: 5px;
+    padding-right: 5px;
+    &:not(:last-child) {
+      border-right: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  }
+  tr:not(:first-child) {
+    &:nth-child(odd) {
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    &:nth-child(even) {
+      border-top: 1px solid rgba(0, 0, 0, 0.2);
+    }
+  }
 }
 
 [v-cloak] { display: none; }

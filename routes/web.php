@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\MahoukaServerRatingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,26 +35,33 @@ Route::post('/auth', [LoginController::class, 'authenticate'])
   ->name('auth')->middleware('guest');
 Route::get('/logout', function() {
   Auth::logout();
-  return back();
+  return redirect()->route('home');
 })->name('logout')->middleware('auth');
 
-Route::get('/forum/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name("forum");
+Route::get('/forum/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name('forum');
 Route::prefix('forum')->name('forum.')->group(function() {
-  Route::post('/add-comment', [ForumController::class, 'addComment'])->name("add-comment");
-  Route::post('/delete-comment', [ForumController::class, 'deleteComment'])->name("delete-comment");
+  Route::post('/add-comment', [ForumController::class, 'addComment'])->name('add-comment');
+  Route::post('/delete-comment', [ForumController::class, 'deleteComment'])->name('delete-comment');
 
-  Route::get('/{id}/add-post', [ForumController::class, 'addPostForm'])->name("add-post-form");
-  Route::post('/add-post', [ForumController::class, 'addPost'])->name("add-post");
-  Route::post('/delete-post', [ForumController::class, 'deletePost'])->name("delete-post");
+  Route::get('/{id}/add-post', [ForumController::class, 'addPostForm'])->name('add-post-form');
+  Route::post('/add-post', [ForumController::class, 'addPost'])->name('add-post');
+  Route::post('/delete-post', [ForumController::class, 'deletePost'])->name('delete-post');
 });
 
 Route::prefix('mahouka')->name('mahouka.')->group(function() {
   Route::get('/', function() {
     return view('mahouka.home');
   })->name('home');
-  Route::get('/top', function() {
-    return view('mahouka.top');
-  })->name('top');
+
+  Route::get('/top', [MahoukaServerRatingController::class, 'top'])->name('top');
+  Route::prefix('top')->name('top.')->middleware('role:admin')->group(function() {
+    Route::get('/load', function() {
+      return view('mahouka.top.load');
+    })->name('load');
+    Route::post('/load', [MahoukaServerRatingController::class, 'preload'])->name('preload');
+    Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
+    Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
+  });
 
   Route::get('/reg', function() {
     return view('auth.reg', ['from' => 'mahouka']);
@@ -61,4 +69,8 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
   Route::get('/login', function() {
     return view('auth.login', ['from' => 'mahouka']);
   })->name('login')->middleware('guest');
+  Route::get('/logout', function() {
+    Auth::logout();
+    return redirect()->route('mahouka.home');
+  })->name('logout')->middleware('auth');
 });
