@@ -53,14 +53,18 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
     return view('mahouka.home');
   })->name('home');
 
-  Route::get('/top', [MahoukaServerRatingController::class, 'top'])->name('top');
-  Route::prefix('top')->name('top.')->middleware('role:admin')->group(function() {
-    Route::get('/load', function() {
-      return view('mahouka.top.load');
-    })->name('load');
-    Route::post('/load', [MahoukaServerRatingController::class, 'preload'])->name('preload');
-    Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
-    Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
+  Route::prefix('top')->name('top.')->group(function() {
+    Route::get('/', [MahoukaServerRatingController::class, 'chart'])->name('chart');
+    Route::get('/table', [MahoukaServerRatingController::class, 'table'])->name('table');
+
+    Route::middleware('role:admin')->group(function() {
+      Route::get('/load', function() {
+        return view('mahouka.top.load');
+      })->name('load');
+      Route::post('/load', [MahoukaServerRatingController::class, 'preload'])->name('preload');
+      Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
+      Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
+    });
   });
 
   Route::get('/reg', function() {

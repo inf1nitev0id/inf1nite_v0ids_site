@@ -3,7 +3,7 @@
 @section('links')
 <ul class="navbar-nav">
   <li class="nav-item"><a class="nav-link" href="{{ route('mahouka.home') }}">Главная</a></li>
-  <li class="nav-item"><a class="nav-link" href="{{ route('mahouka.top') }}">Рейтинг сервера</a></li>
+  <li class="nav-item"><a class="nav-link" href="{{ route('mahouka.top.chart') }}">Статистика сервера</a></li>
 </ul>
 @if (Auth::check())
   <div class="btn-group ml-auto" role="group" aria-label="Управление аккаунтом">

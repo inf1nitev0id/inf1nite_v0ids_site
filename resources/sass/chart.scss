@@ -1,0 +1,20 @@
+svg {
+  g.line {
+    polyline {
+      stroke-width: 2;
+    }
+    text {
+      visibility: hidden;
+      font-size: 9px;
+    }
+
+    &:hover {
+      polyline {
+        stroke-width: 3;
+      }
+      text {
+        visibility: visible;
+      }
+    }
+  }
+}
