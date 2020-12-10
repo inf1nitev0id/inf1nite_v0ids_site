@@ -1,18 +1,24 @@
 @extends('layouts.mahouka')
 
-@section('title') Рейтинг сервера @endsection
+@section('title') Статистика сервера @endsection
 
 @section('content')
-<h5>Рейтинг сервера</h5>
+<h5>Статистика сервера <a href="{{ route('mahouka.top.chart') }}">График</a></h5>
 <div class="overflow">
   <table class="container-fluid rating">
     <tr>
       <th colspan=2></th>
       @foreach($sorted_users as $user)
-      	<th nowrap>{{ $user['name'] }}</th>
+      	<th nowrap>
+          {{ $user['name'] }}
+          @if ($user['alias'] != null)
+            <br />
+            {{ $user['alias'] }}
+          @endif
+        </th>
       @endforeach
     </tr>
-    @for ($date = $min_date; $date <= $max_date; $date->add($step))
+    @for ($date = clone($min_date); $date <= $max_date; $date->add($step))
       <tr>
         <?php
           $line1 = "";

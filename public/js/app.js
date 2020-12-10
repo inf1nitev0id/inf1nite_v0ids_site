@@ -19377,6 +19377,17 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 /***/ }),
 
+/***/ "./resources/sass/chart.scss":
+/*!***********************************!*\
+  !*** ./resources/sass/chart.scss ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "./resources/sass/forum.scss":
 /*!***********************************!*\
   !*** ./resources/sass/forum.scss ***!
@@ -19400,13 +19411,14 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 /***/ }),
 
 /***/ 0:
-/*!***********************************************************************************************************************!*\
-  !*** multi ./resources/js/app.js ./resources/sass/mahouka.scss ./resources/sass/forum.scss ./resources/sass/app.scss ***!
-  \***********************************************************************************************************************/
+/*!***************************************************************************************************************************************************!*\
+  !*** multi ./resources/js/app.js ./resources/sass/chart.scss ./resources/sass/mahouka.scss ./resources/sass/forum.scss ./resources/sass/app.scss ***!
+  \***************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\js\app.js */"./resources/js/app.js");
+__webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\chart.scss */"./resources/sass/chart.scss");
 __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\mahouka.scss */"./resources/sass/mahouka.scss");
 __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\forum.scss */"./resources/sass/forum.scss");
 module.exports = __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\app.scss */"./resources/sass/app.scss");
