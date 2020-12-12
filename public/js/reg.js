@@ -138,7 +138,7 @@ window.onload = function () {
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\js\reg.js */"./resources/js/reg.js");
+module.exports = __webpack_require__(/*! F:\data\htdocs\www\inf1nite_v0ids_site\resources\js\reg.js */"./resources/js/reg.js");
 
 
 /***/ })
