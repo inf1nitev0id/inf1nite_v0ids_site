@@ -284,31 +284,59 @@ class MahoukaServerRatingController extends Controller
     return view('mahouka.top.table', $this->top());
   }
 
-  private static function getColor($i) {
-    switch ($i % 6) {
+  private static function getColor($id) {
+    $r; $g; $b;
+    $n1 = 200;
+    $n0 = 0;
+    switch ($id % 6) {
       case 0:
-        return "#B00";
+        $r = $n1;
+        $g = $n0;
+        $b = $n0;
+        break;
       case 1:
-        return "#0B0";
+        $r = $n0;
+        $g = $n1;
+        $b = $n0;
+        break;
       case 2:
-        return "#00B";
+        $r = $n0;
+        $g = $n0;
+        $b = $n1;
+        break;
       case 3:
-        return "#BB0";
+        $r = $n1;
+        $g = $n1;
+        $b = $n0;
+        break;
       case 4:
-        return "#B0B";
+        $r = $n1;
+        $g = $n0;
+        $b = $n1;
+        break;
       case 5:
-        return "#0BB";
+        $r = $n0;
+        $g = $n1;
+        $b = $n1;
+        break;
     }
+    while ($id >= 6) {
+      $r = round($r * 0.9);
+      $g = round($g * 0.9);
+      $b = round($b * 0.9);
+      $id -= 6;
+    }
+    return 'rgb('.$r.','.$g.','.$b.')';
   }
 
   public function chart() {
-    $V_MULTIPLIER = 40;
-
     $top = $this->top();
     $max_rate = MahoukaServerRating::select('rate')->orderBy('rate', 'desc')->first()->rate;
-    $days = $top['min_date']->diff($top['max_date'])->days;
-    $x_size = $days * 20;
-    $y_size = ceil($max_rate / 1000) * $V_MULTIPLIER + 50;
+
+    $dates = [];
+    for ($date = clone($top['min_date']); $date <= $top['max_date']; $date->add($top['step'])) {
+      $dates[] = $date->format('Y-m-d');
+    }
 
     $lines = [];
     foreach ($top['rating_table'] as $key => $row){
@@ -317,43 +345,17 @@ class MahoukaServerRatingController extends Controller
       $user = MahoukaServerUser::find($key);
       $line['user']['name'] = $user->name;
       $line['user']['alias'] = $user->alias;
-      $line['color'] = $this->getColor(count($lines));
-      $i = 0;
-      $last_y = 0;
-      $start = false;
-      $line['points'] = [];
-      for ($date = clone($top['min_date']); $date <= $top['max_date']; $date->add($top['step'])) {
-        $d = $date->format('Y-m-d');
-        if ($start || array_key_exists($d, $row)) {
-          $line['points'][] = [
-            'x' => $i + 5,
-            'y' => $y_size - ($last_y = $row[$d][0] ?? $last_y) / 1000 * $V_MULTIPLIER,
-            'rate' => $row[$d][0] ?? $last_y
-          ];
-          $line['points'][] = [
-            'x' => $i + 15,
-            'y' => $y_size - ($last_y = $row[$d][1] ?? $last_y) / 1000 * $V_MULTIPLIER,
-            'rate' => $row[$d][1] ?? $last_y
-          ];
-          $start = true;
-        }
-        $i += 20;
+      $line['color'] = $this->getColor($key - 1);
+      $line['rating'] = [];
+      foreach ($dates as $date) {
+        $line['rating'][] = $row[$date][0] ?? null;
+        $line['rating'][] = $row[$date][1] ?? null;
       }
       $lines[] = $line;
     }
 
-    $dates = [];
-    for ($date = clone($top['min_date']); $date <= $top['max_date']; $date->add($top['step'])) {
-      $dates[] = $date->format('d.m.Y');
-    }
-
     return view('mahouka.top.chart', [
-      'sorted_users' => $top['sorted_users'],
       'dates' => $dates,
-      'step' => $top['step'],
-      'days' => $days,
-      'x_size' => $x_size,
-      'y_size' => $y_size,
       'lines' => $lines
     ]);
   }

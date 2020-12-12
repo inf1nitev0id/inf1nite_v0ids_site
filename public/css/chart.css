@@ -1,17 +1,23 @@
-svg g.line polyline {
+svg polyline.line {
   stroke-width: 2;
+  fill: none;
 }
 
-svg g.line text {
-  visibility: hidden;
-  font-size: 9px;
+svg polyline.line:hover {
+  stroke-width: 4;
 }
 
-svg g.line:hover polyline {
-  stroke-width: 3;
+svg polyline.line.selected {
+  stroke-width: 4;
 }
 
-svg g.line:hover text {
-  visibility: visible;
+svg g.chart-grid line {
+  fill: none;
+  stroke-width: 1;
+  stroke: #DDD;
+}
+
+div.selected {
+  font-style: italic;
 }
 
