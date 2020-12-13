@@ -102,7 +102,8 @@ window.onload = function () {
       day_width: 20,
       lines: lines,
       dates: dates,
-      selected: 0
+      selected: 0,
+      month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
     created: function created() {
       for (var i = 0; i < this.lines.length; i++) {
@@ -192,8 +193,11 @@ window.onload = function () {
       verticalDivisions: function verticalDivisions() {
         var xs = [];
 
-        for (var x = this.day_width; x < this.sizeX; x += this.day_width) {
-          xs.push(x);
+        for (var i = 0; i < this.dates.length; i++) {
+          xs.push({
+            x: i * this.day_width,
+            y: i == 0 ? 0 : this.sizeY + 15 + (this.dates[i].getDate() == 1 ? 15 : 0)
+          });
         }
 
         return xs;
@@ -202,10 +206,67 @@ window.onload = function () {
         var ys = [];
 
         for (var y = 0; y < this.height; y += this.divisionValue) {
-          ys.push(Math.round(y * this.scale));
+          ys.push({
+            y: Math.round(y * this.scale),
+            value: this.height - y
+          });
         }
 
         return ys;
+      },
+      months: function months() {
+        var m = [];
+        var start_x = 0;
+        var month = this.dates[0].getMonth();
+
+        for (var i = 1; i < this.dates.length; i++) {
+          var date = this.dates[i];
+
+          if (date.getMonth() != month) {
+            var length = i * this.day_width - start_x;
+            m.push({
+              x: start_x + length / 2,
+              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
+            });
+            start_x += length;
+            month = date.getMonth();
+          }
+
+          if (i + 1 == this.dates.length) {
+            var _length = (i + 1) * this.day_width - start_x;
+
+            m.push({
+              x: start_x + _length / 2,
+              text: _length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (_length >= 100 ? ' ' + date.getFullYear() : '')
+            });
+          }
+        }
+
+        return m;
+      }
+    },
+    methods: {
+      setSelected: function setSelected(id) {
+        if (this.selected == id) {
+          this.selected = 0;
+        } else {
+          this.selected = id;
+        }
+      },
+      showAll: function showAll() {
+        for (var i = 0; i < this.lines.length; i++) {
+          this.lines[i].visible = true;
+        }
+      },
+      hideAll: function hideAll() {
+        for (var i = 0; i < this.lines.length; i++) {
+          this.lines[i].visible = false;
+        }
+      },
+      invert: function invert() {
+        for (var i = 0; i < this.lines.length; i++) {
+          this.lines[i].visible = !this.lines[i].visible;
+        }
       }
     }
   });

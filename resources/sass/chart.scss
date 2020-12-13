@@ -17,6 +17,16 @@ svg {
   }
 }
 
+.overflow {
+  overflow-x: scroll;
+}
+
+.axis-text {
+  color: #888;
+  fill: #888;
+  font-size: 12px;
+}
+
 div.selected {
   font-style: italic;
 }
