@@ -11,7 +11,7 @@ body {
   height: 32px;
 }
 
-li {
+ul > li {
   list-style-type: none;
 }
 
@@ -38,10 +38,6 @@ form {
   align-items: center;
   -webkit-box-pack: center;
   justify-content: center;
-}
-
-.overflow {
-  overflow-x: scroll;
 }
 
 table {

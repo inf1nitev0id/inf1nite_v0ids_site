@@ -19423,6 +19423,7 @@ __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\mahouka.scss
 __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\forum.scss */"./resources/sass/forum.scss");
 module.exports = __webpack_require__(/*! D:\sites\inf1nite_v0ids_site\resources\sass\app.scss */"./resources/sass/app.scss");
 
+
 /***/ })
 
 /******/ });

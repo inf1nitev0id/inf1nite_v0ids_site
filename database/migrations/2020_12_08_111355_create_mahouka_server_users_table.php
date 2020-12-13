@@ -15,8 +15,8 @@ class CreateMahoukaServerUsersTable extends Migration
     {
         Schema::create('mahouka_server_users', function (Blueprint $table) {
             $table->id();
-            $table->text('name');
-            $table->text('alias')->nullable();
+            $table->string('name', 255);
+            $table->string('alias', 255)->nullable();
             $table->boolean('hidden')->default(false);
             $table->date('join_date')->nallable();
         });

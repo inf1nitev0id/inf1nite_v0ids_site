@@ -1,20 +1,32 @@
 svg {
-  g.line {
-    polyline {
-      stroke-width: 2;
-    }
-    text {
-      visibility: hidden;
-      font-size: 9px;
-    }
-
+  polyline.line {
+    stroke-width: 2;
+    fill: none;
     &:hover {
-      polyline {
-        stroke-width: 3;
-      }
-      text {
-        visibility: visible;
-      }
+      stroke-width: 4;
+    }
+    &.selected {
+      stroke-width: 4;
     }
   }
+
+  g.chart-grid line {
+    fill: none;
+    stroke-width: 1;
+    stroke: #DDD;
+  }
+}
+
+.overflow {
+  overflow-x: scroll;
+}
+
+.axis-text {
+  color: #888;
+  fill: #888;
+  font-size: 12px;
+}
+
+div.selected {
+  font-style: italic;
 }
