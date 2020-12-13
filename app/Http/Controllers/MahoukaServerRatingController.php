@@ -347,9 +347,10 @@ class MahoukaServerRatingController extends Controller
       $line['user']['alias'] = $user->alias;
       $line['color'] = $this->getColor($key - 1);
       $line['rating'] = [];
-      foreach ($dates as $date) {
+      foreach ($dates as $key => $date) {
         $line['rating'][] = $row[$date][0] ?? null;
-        $line['rating'][] = $row[$date][1] ?? null;
+        if ($key + 1 != count($dates))
+          $line['rating'][] = $row[$date][1] ?? null;
       }
       $lines[] = $line;
     }
