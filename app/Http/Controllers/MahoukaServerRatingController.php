@@ -44,6 +44,14 @@ class MahoukaServerRatingController extends Controller
     return $result;
   }
 
+  public function loadForm() {
+    $query = MahoukaServerRating::select('date', 'time')->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
+    return view('mahouka.top.load', [
+      'last_date' => $query->date,
+      'last_time' => $query->time
+    ]);
+  }
+
   public function preload(Request $request) {
     $request->validate([
       'url' => 'url|required',
