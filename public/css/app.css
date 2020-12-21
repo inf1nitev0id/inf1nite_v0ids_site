@@ -56,6 +56,10 @@ table.rating tr:not(:first-child):nth-child(even) {
   border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.overflow {
+  overflow-x: scroll;
+}
+
 [v-cloak] {
   display: none;
 }
