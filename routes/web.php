@@ -58,9 +58,7 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
     Route::get('/table', [MahoukaServerRatingController::class, 'table'])->name('table');
 
     Route::middleware('role:admin')->group(function() {
-      Route::get('/load', function() {
-        return view('mahouka.top.load');
-      })->name('load');
+      Route::get('/load', [MahoukaServerRatingController::class, 'loadForm'])->name('load');
       Route::post('/load', [MahoukaServerRatingController::class, 'preload'])->name('preload');
       Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
       Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
