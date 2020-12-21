@@ -39,11 +39,11 @@
 <h5>Статистика сервера <a href="{{ route('mahouka.top.table') }}">Таблица</a></h5>
 <div id="chart">
   <p v-if="false">Для работы этой страницы необходим JS, если вы видете эту надпись, значит он не работает в вашем браузере.</p>
-  <div style="position: relative;">
+  <div v-cloak style="position: relative;">
     <div v-for="y in horizontalDivisions" class="axis-text" :style="{position: 'absolute', top: y.y + 'px', left: '5px'}">
     @{{ y.value }}
     </div>
-    <div v-cloak class="overflow">
+    <div class="overflow">
       <svg
         version="1.1"
         baseProfile="full"
@@ -73,7 +73,7 @@
       </svg>
     </div>
   </div>
-  <div class="btn-group m-1">
+  <div v-cloak class="btn-group m-1">
     <div class="btn btn-outline-secondary" title="Показать всё" @click="showAll()">
       <i class="far fa-eye"></i>
     </div>
@@ -84,7 +84,7 @@
       <i class="far fa-eye-slash"></i>
     </div>
   </div>
-  <div>
+  <div v-cloak>
     <div v-for="line in lines" class="btn-group m-1">
       <div class="btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="setSelected(line.user.id)">
         @{{ line.user.name }}
