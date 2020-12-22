@@ -157,17 +157,40 @@ window.onload = function () {
       scale: function scale() {
         return this.sizeY / this.height;
       },
-      points: function points() {
-        var points = new Array(this.lines.length);
+      notSelectedLines: function notSelectedLines() {
+        var selected = this.selected;
+
+        if (selected == 0) {
+          return this.lines;
+        } else {
+          return this.lines.filter(function (item) {
+            return item.user.id != selected;
+          });
+        }
+      },
+      selectedLine: function selectedLine() {
+        var selected = this.selected;
+
+        if (selected == 0) {
+          return [];
+        } else {
+          return this.lines.find(function (item) {
+            return item.user.id == selected;
+          });
+        }
+      },
+      chart: function chart() {
+        var chart = new Array(this.lines.length);
 
         for (var index = 0; index < this.lines.length; index++) {
           var line = this.lines[index].rating;
           var start = false;
-          var last_y;
-          points[index] = [];
+          var prev = false;
+          var last_y = void 0;
+          var points = [];
 
           for (var i = 0; i < line.length; i++) {
-            if (start || line[i] !== null) {
+            if (line[i] !== null || start) {
               if (!start) {
                 start = true;
               }
@@ -176,16 +199,47 @@ window.onload = function () {
                   y = void 0;
               x = Math.floor(i / 2) * this.day_width + this.day_width / 4 + i % 2 * this.day_width / 2;
 
-              if (line[i] !== null) {
+              if (line[i] !== null && line[i] != last_y) {
                 y = line[i] * this.scale;
-                last_y = y;
+                last_y = line[i];
+                points.push({
+                  x: Math.round(x),
+                  y: -Math.round(y),
+                  rate: line[i]
+                });
+                prev = true;
               } else {
-                y = last_y;
+                if (prev) {
+                  y = last_y * this.scale;
+                  points.push({
+                    x: Math.round(x),
+                    y: -Math.round(y),
+                    rate: line[i - 1]
+                  });
+                  prev = false;
+                } else {
+                  points[points.length - 1].x = x;
+                }
               }
-
-              points[index].push(Math.round(x) + ',' + -Math.round(y));
             }
           }
+
+          chart[index] = points;
+        }
+
+        return chart;
+      },
+      points: function points() {
+        var points = [];
+
+        for (var index = 0; index < this.chart.length; index++) {
+          var line = '';
+
+          for (var i = 0; i < this.chart[index].length; i++) {
+            line += this.chart[index][i].x + ',' + this.chart[index][i].y + ' ';
+          }
+
+          points.push(line);
         }
 
         return points;
@@ -252,6 +306,9 @@ window.onload = function () {
         } else {
           this.selected = id;
         }
+      },
+      isUp: function isUp(y, rate) {
+        return -y < String(rate).length * 9;
       },
       showAll: function showAll() {
         for (var i = 0; i < this.lines.length; i++) {

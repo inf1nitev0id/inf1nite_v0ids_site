@@ -9,6 +9,8 @@ svg polyline.line:hover {
 
 svg polyline.line.selected {
   stroke-width: 4;
+  -webkit-animation: selected 2s infinite linear;
+          animation: selected 2s infinite linear;
 }
 
 svg g.chart-grid line {
@@ -17,10 +19,33 @@ svg g.chart-grid line {
   stroke: #DDD;
 }
 
+@-webkit-keyframes selected {
+  50% {
+    stroke: #EEE;
+  }
+}
+
+@keyframes selected {
+  50% {
+    stroke: #EEE;
+  }
+}
+
 .axis-text {
   color: #888;
   fill: #888;
   font-size: 12px;
+}
+
+.rate-text {
+  fill: #444;
+  font-size: 10px;
+}
+
+.rate-text-border {
+  stroke-width: 1.5;
+  stroke: #DDD;
+  font-size: 10px;
 }
 
 div.selected {
