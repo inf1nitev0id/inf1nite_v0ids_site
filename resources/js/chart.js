@@ -6,6 +6,7 @@ window.onload = function () {
       day_width: 20,
       lines: lines,
       dates: dates,
+			events_list: events,
       selected: 0,
       month_names: [
         'январь',
@@ -174,7 +175,7 @@ window.onload = function () {
             let length = i * this.day_width - start_x
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
             })
             start_x += length
             month = date.getMonth()
@@ -183,12 +184,47 @@ window.onload = function () {
             let length = (i + 1) * this.day_width - start_x
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
             })
           }
         }
         return m
       },
+			eventsDays: function() {
+				var events = []
+				var day = 0
+				var same = false;
+				for (let i = 0; i < this.events_list.length; i++) {
+					while (this.dates[day] < this.events_list[i].date) {
+						day++
+						same = false
+						if (day == this.dates.length) {
+							return events
+						}
+					}
+					let event = {
+						description: this.events_list[i].description,
+						color: this.events_list[i].color,
+						important: this.events_list[i].important,
+						toString: function() {
+							return this.description
+						}
+					}
+					if (same) {
+						events[events.length - 1].events.push(event)
+					} else {
+						events.push({
+							date: this.events_list[i].date,
+							x: day * this.day_width,
+							events: [
+								event
+							]
+						})
+						same = true
+					}
+				}
+				return events
+			},
     },
     methods: {
       setSelected: function(id) {
@@ -216,6 +252,14 @@ window.onload = function () {
           this.lines[i].visible = !this.lines[i].visible;
         }
       },
+			showEvent: function(id) {
+				var day = this.eventsDays[id]
+				var message = day.date.getDate() + ' '
+					+ this.month_names[day.date.getMonth()].substr(0, 3) + ' '
+					+ day.date.getFullYear() + '\n'
+					+ day.events.join('\n')
+				alert(message)
+			}
     },
   })
 }

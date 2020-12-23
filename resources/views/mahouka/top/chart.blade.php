@@ -19,17 +19,23 @@
         name: '{{ $line['user']['name'] }}',
         alias: '{{ $line['user']['alias'] }}'
       },
-      rating: [
-      @foreach ($line['rating'] as $rate)
-        {{ $rate ?? 'null' }},
-      @endforeach
-      ],
+      rating: [@foreach ($line['rating'] as $rate){{ $rate ?? 'null' }}, @endforeach],
       max: 0,
       color: '{{ $line['color'] }}',
       visible: true,
     },
   @endforeach
   ]
+	var events = [
+	@foreach ($events as $event)
+		{
+			description: '{{ ($event['series'] !== null ? $event['series'].": " : "").$event['name'] }}',
+			date: new Date('{{ $event['date'] }}'),
+			important: {{ $event['important'] ? 'true' : 'false' }},
+			color: '#{{ $event['color'] }}',
+		},
+	@endforeach
+	]
 </script>
 <script src="/js/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
@@ -42,7 +48,7 @@
   <p v-if="false">Для работы этой страницы необходим JS, если вы видете эту надпись, значит он не работает в вашем браузере.</p>
   <div v-cloak style="position: relative;">
     <div v-for="y in horizontalDivisions" class="axis-text" :style="{position: 'absolute', top: y.y + 5 + 'px', left: '5px'}">
-    @{{ y.value }}
+    	@{{ y.value }}
     </div>
     <div class="overflow">
       <svg
@@ -58,6 +64,11 @@
         @click.self="selected = 0"
         >
 				<g transform="translate(0, 5)">
+					<g>
+						<template v-for="(day, index) in eventsDays">
+							<rect v-for="event in day.events" @click="showEvent(index)" class="event" :class="{important: event.important}" :fill="event.color" :x="day.x" y="0" :width="day_width" :height="sizeY" />
+						</template>
+					</g>
 	        <g class="chart-grid">
 						<line v-for="x in verticalDivisions" :x1="x.x" y1="0" :x2="x.x" :y2="x.y" />
 						<line v-for="y in horizontalDivisions" x1="0" :y1="y.y" :x2="sizeX" :y2="y.y" />
@@ -86,17 +97,19 @@
       </svg>
     </div>
   </div>
-  <div v-cloak class="btn-group m-1">
-    <div class="btn btn-outline-secondary" title="Показать всё" @click="showAll()">
-      <i class="far fa-eye"></i>
-    </div>
-    <div class="btn btn-outline-secondary" title="Инвертировать" @click="invert()">
-      <i class="fas fa-exclamation"></i>
-    </div>
-    <div class="btn btn-outline-secondary" title="Скрыть всё" @click="hideAll()">
-      <i class="far fa-eye-slash"></i>
-    </div>
-  </div>
+	<div v-cloak class="form-inline">
+	  <div class="btn-group m-1">
+	    <div class="btn btn-outline-secondary" title="Показать всё" @click="showAll()">
+	      <i class="far fa-eye"></i>
+	    </div>
+	    <div class="btn btn-outline-secondary" title="Инвертировать" @click="invert()">
+	      <i class="fas fa-exclamation"></i>
+	    </div>
+	    <div class="btn btn-outline-secondary" title="Скрыть всё" @click="hideAll()">
+	      <i class="far fa-eye-slash"></i>
+	    </div>
+	  </div>
+	</div>
   <div v-cloak>
     <div v-for="line in lines" class="btn-group m-1">
       <div class="btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="setSelected(line.user.id)">

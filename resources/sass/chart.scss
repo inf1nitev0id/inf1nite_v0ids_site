@@ -16,6 +16,13 @@ svg {
     stroke-width: 1;
     stroke: #DDD;
   }
+
+	rect.event {
+		opacity: 20%;
+		&.important {
+			opacity: 30%;
+		}
+	}
 }
 
 @keyframes selected {

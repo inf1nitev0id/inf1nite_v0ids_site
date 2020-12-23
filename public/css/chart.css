@@ -19,6 +19,14 @@ svg g.chart-grid line {
   stroke: #DDD;
 }
 
+svg rect.event {
+  opacity: 20%;
+}
+
+svg rect.event.important {
+  opacity: 30%;
+}
+
 @-webkit-keyframes selected {
   50% {
     stroke: #EEE;

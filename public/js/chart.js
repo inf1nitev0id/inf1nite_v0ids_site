@@ -102,6 +102,7 @@ window.onload = function () {
       day_width: 20,
       lines: lines,
       dates: dates,
+      events_list: events,
       selected: 0,
       month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
@@ -280,7 +281,7 @@ window.onload = function () {
             var length = i * this.day_width - start_x;
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
             });
             start_x += length;
             month = date.getMonth();
@@ -291,12 +292,50 @@ window.onload = function () {
 
             m.push({
               x: start_x + _length / 2,
-              text: _length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (_length >= 100 ? ' ' + date.getFullYear() : '')
+              text: _length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (_length >= 100 ? ' ' + date.getFullYear() : '')
             });
           }
         }
 
         return m;
+      },
+      eventsDays: function eventsDays() {
+        var events = [];
+        var day = 0;
+        var same = false;
+
+        for (var i = 0; i < this.events_list.length; i++) {
+          while (this.dates[day] < this.events_list[i].date) {
+            day++;
+            same = false;
+
+            if (day == this.dates.length) {
+              return events;
+            }
+          }
+
+          var event = {
+            description: this.events_list[i].description,
+            color: this.events_list[i].color,
+            important: this.events_list[i].important,
+            toString: function toString() {
+              return this.description;
+            }
+          };
+
+          if (same) {
+            events[events.length - 1].events.push(event);
+          } else {
+            events.push({
+              date: this.events_list[i].date,
+              x: day * this.day_width,
+              events: [event]
+            });
+            same = true;
+          }
+        }
+
+        return events;
       }
     },
     methods: {
@@ -324,6 +363,11 @@ window.onload = function () {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = !this.lines[i].visible;
         }
+      },
+      showEvent: function showEvent(id) {
+        var day = this.eventsDays[id];
+        var message = day.date.getDate() + ' ' + this.month_names[day.date.getMonth()].substr(0, 3) + ' ' + day.date.getFullYear() + '\n' + day.events.join('\n');
+        alert(message);
       }
     }
   });
