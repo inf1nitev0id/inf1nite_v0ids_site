@@ -102,6 +102,7 @@ window.onload = function () {
       day_width: 20,
       lines: lines,
       dates: dates,
+      events_list: events,
       selected: 0,
       month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
@@ -157,17 +158,40 @@ window.onload = function () {
       scale: function scale() {
         return this.sizeY / this.height;
       },
-      points: function points() {
-        var points = new Array(this.lines.length);
+      notSelectedLines: function notSelectedLines() {
+        var selected = this.selected;
+
+        if (selected == 0) {
+          return this.lines;
+        } else {
+          return this.lines.filter(function (item) {
+            return item.user.id != selected;
+          });
+        }
+      },
+      selectedLine: function selectedLine() {
+        var selected = this.selected;
+
+        if (selected == 0) {
+          return [];
+        } else {
+          return this.lines.find(function (item) {
+            return item.user.id == selected;
+          });
+        }
+      },
+      chart: function chart() {
+        var chart = new Array(this.lines.length);
 
         for (var index = 0; index < this.lines.length; index++) {
           var line = this.lines[index].rating;
           var start = false;
-          var last_y;
-          points[index] = [];
+          var prev = false;
+          var last_y = void 0;
+          var points = [];
 
           for (var i = 0; i < line.length; i++) {
-            if (start || line[i] !== null) {
+            if (line[i] !== null || start) {
               if (!start) {
                 start = true;
               }
@@ -176,16 +200,47 @@ window.onload = function () {
                   y = void 0;
               x = Math.floor(i / 2) * this.day_width + this.day_width / 4 + i % 2 * this.day_width / 2;
 
-              if (line[i] !== null) {
+              if (line[i] !== null && line[i] != last_y) {
                 y = line[i] * this.scale;
-                last_y = y;
+                last_y = line[i];
+                points.push({
+                  x: Math.round(x),
+                  y: -Math.round(y),
+                  rate: line[i]
+                });
+                prev = true;
               } else {
-                y = last_y;
+                if (prev) {
+                  y = last_y * this.scale;
+                  points.push({
+                    x: Math.round(x),
+                    y: -Math.round(y),
+                    rate: line[i - 1]
+                  });
+                  prev = false;
+                } else {
+                  points[points.length - 1].x = x;
+                }
               }
-
-              points[index].push(Math.round(x) + ',' + -Math.round(y));
             }
           }
+
+          chart[index] = points;
+        }
+
+        return chart;
+      },
+      points: function points() {
+        var points = [];
+
+        for (var index = 0; index < this.chart.length; index++) {
+          var line = '';
+
+          for (var i = 0; i < this.chart[index].length; i++) {
+            line += this.chart[index][i].x + ',' + this.chart[index][i].y + ' ';
+          }
+
+          points.push(line);
         }
 
         return points;
@@ -226,7 +281,7 @@ window.onload = function () {
             var length = i * this.day_width - start_x;
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
             });
             start_x += length;
             month = date.getMonth();
@@ -237,12 +292,50 @@ window.onload = function () {
 
             m.push({
               x: start_x + _length / 2,
-              text: _length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (_length >= 100 ? ' ' + date.getFullYear() : '')
+              text: _length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (_length >= 100 ? ' ' + date.getFullYear() : '')
             });
           }
         }
 
         return m;
+      },
+      eventsDays: function eventsDays() {
+        var events = [];
+        var day = 0;
+        var same = false;
+
+        for (var i = 0; i < this.events_list.length; i++) {
+          while (this.dates[day] < this.events_list[i].date) {
+            day++;
+            same = false;
+
+            if (day == this.dates.length) {
+              return events;
+            }
+          }
+
+          var event = {
+            description: this.events_list[i].description,
+            color: this.events_list[i].color,
+            important: this.events_list[i].important,
+            toString: function toString() {
+              return this.description;
+            }
+          };
+
+          if (same) {
+            events[events.length - 1].events.push(event);
+          } else {
+            events.push({
+              date: this.events_list[i].date,
+              x: day * this.day_width,
+              events: [event]
+            });
+            same = true;
+          }
+        }
+
+        return events;
       }
     },
     methods: {
@@ -252,6 +345,9 @@ window.onload = function () {
         } else {
           this.selected = id;
         }
+      },
+      isUp: function isUp(y, rate) {
+        return -y < String(rate).length * 9;
       },
       showAll: function showAll() {
         for (var i = 0; i < this.lines.length; i++) {
@@ -267,6 +363,11 @@ window.onload = function () {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = !this.lines[i].visible;
         }
+      },
+      showEvent: function showEvent(id) {
+        var day = this.eventsDays[id];
+        var message = day.date.getDate() + ' ' + this.month_names[day.date.getMonth()].substr(0, 3) + ' ' + day.date.getFullYear() + '\n' + day.events.join('\n');
+        alert(message);
       }
     }
   });

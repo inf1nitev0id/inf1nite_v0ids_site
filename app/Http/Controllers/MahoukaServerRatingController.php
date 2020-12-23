@@ -7,6 +7,8 @@ use App\Models\MahoukaServerUser;
 use App\Models\MahoukaServerHash;
 use App\Models\MahoukaServerRating;
 use App\Models\MahoukaServerNumber;
+use App\Models\MahoukaServerEvent;
+use App\Models\MahoukaSeries;
 
 class MahoukaServerRatingController extends Controller
 {
@@ -364,7 +366,9 @@ class MahoukaServerRatingController extends Controller
 
     return view('mahouka.top.chart', [
       'dates' => $dates,
-      'lines' => $lines
+      'lines' => $lines,
+			'events' => MahoukaServerEvent::getEvents(),
+			// 'series' => MahoukaSeries::getSeries()
     ]);
   }
 }

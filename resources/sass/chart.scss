@@ -7,6 +7,7 @@ svg {
     }
     &.selected {
       stroke-width: 4;
+			animation: selected 2s infinite linear;
     }
   }
 
@@ -15,12 +16,35 @@ svg {
     stroke-width: 1;
     stroke: #DDD;
   }
+
+	rect.event {
+		opacity: 20%;
+		&.important {
+			opacity: 30%;
+		}
+	}
+}
+
+@keyframes selected {
+	0% {}
+	50% {stroke: #EEE;}
 }
 
 .axis-text {
   color: #888;
   fill: #888;
   font-size: 12px;
+}
+
+.rate-text {
+	fill: #444;
+	font-size: 10px;
+}
+
+.rate-text-border {
+	stroke-width: 1.5;
+	stroke: #DDD;
+	font-size: 10px;
 }
 
 div.selected {

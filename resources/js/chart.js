@@ -6,6 +6,7 @@ window.onload = function () {
       day_width: 20,
       lines: lines,
       dates: dates,
+			events_list: events,
       selected: 0,
       month_names: [
         'январь',
@@ -42,7 +43,7 @@ window.onload = function () {
         var max = 0
         for (let i = 0; i < this.lines.length; i++) {
           if (this.lines[i].visible && this.lines[i].max > max)
-          max = this.lines[i].max
+          	max = this.lines[i].max
         }
         return max
       },
@@ -70,32 +71,80 @@ window.onload = function () {
       scale: function() {
         return this.sizeY / this.height
       },
-      points: function() {
-        var points = new Array(this.lines.length)
+			notSelectedLines: function() {
+				var selected = this.selected
+				if (selected == 0) {
+					return this.lines
+				} else {
+					return this.lines.filter(function(item) {
+						return item.user.id != selected
+					})
+				}
+			},
+			selectedLine: function() {
+				var selected = this.selected
+				if (selected == 0) {
+					return []
+				} else {
+					return this.lines.find(function(item) {
+						return item.user.id == selected
+					})
+				}
+			},
+      chart: function() {
+				var chart = new Array(this.lines.length)
         for (let index = 0; index < this.lines.length; index++) {
-          var line = this.lines[index].rating
-          var start = false
-          var last_y
-          points[index] = []
+          let line = this.lines[index].rating
+          let start = false
+					let prev = false
+          let last_y
+					let points = []
           for (let i = 0; i < line.length; i++) {
-            if (start || line[i] !== null) {
+            if (line[i] !== null || start) {
               if (!start) {
                 start = true
               }
               let x, y
               x = Math.floor(i / 2) * this.day_width + this.day_width / 4 + i % 2 * this.day_width / 2
-              if (line[i] !== null) {
-                y = line[i] * this.scale
-                last_y = y
+              if (line[i] !== null && line[i] != last_y) {
+								y = line[i] * this.scale
+	              last_y = line[i]
+								points.push({
+									x: Math.round(x),
+									y: -Math.round(y),
+									rate: line[i]
+								});
+								prev = true
               } else {
-                y = last_y
-              }
-              points[index].push(Math.round(x) + ',' + -Math.round(y))
+								if (prev) {
+									y = last_y * this.scale
+									points.push({
+										x: Math.round(x),
+										y: -Math.round(y),
+										rate: line[i - 1]
+									});
+									prev = false
+								} else {
+									points[points.length - 1].x = x
+								}
+							}
             }
           }
+					chart[index] = points
         }
-        return points
+        return chart;
       },
+			points: function() {
+				var points = [];
+				for (let index = 0; index < this.chart.length; index++) {
+					let line = ''
+					for (let i = 0; i < this.chart[index].length; i++) {
+						line += this.chart[index][i].x + ',' + this.chart[index][i].y + ' '
+					}
+					points.push(line)
+				}
+				return points
+			},
       verticalDivisions: function() {
         var xs = []
         for (let i = 0; i < this.dates.length; i++) {
@@ -126,7 +175,7 @@ window.onload = function () {
             let length = i * this.day_width - start_x
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
             })
             start_x += length
             month = date.getMonth()
@@ -135,12 +184,47 @@ window.onload = function () {
             let length = (i + 1) * this.day_width - start_x
             m.push({
               x: start_x + length / 2,
-              text: length < 60 ? this.month_names[month - 1].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
+              text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : ''),
             })
           }
         }
         return m
       },
+			eventsDays: function() {
+				var events = []
+				var day = 0
+				var same = false;
+				for (let i = 0; i < this.events_list.length; i++) {
+					while (this.dates[day] < this.events_list[i].date) {
+						day++
+						same = false
+						if (day == this.dates.length) {
+							return events
+						}
+					}
+					let event = {
+						description: this.events_list[i].description,
+						color: this.events_list[i].color,
+						important: this.events_list[i].important,
+						toString: function() {
+							return this.description
+						}
+					}
+					if (same) {
+						events[events.length - 1].events.push(event)
+					} else {
+						events.push({
+							date: this.events_list[i].date,
+							x: day * this.day_width,
+							events: [
+								event
+							]
+						})
+						same = true
+					}
+				}
+				return events
+			},
     },
     methods: {
       setSelected: function(id) {
@@ -150,6 +234,9 @@ window.onload = function () {
           this.selected = id
         }
       },
+			isUp: function(y, rate) {
+				return -y < String(rate).length * 9
+			},
       showAll: function() {
         for (let i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = true;
@@ -165,6 +252,14 @@ window.onload = function () {
           this.lines[i].visible = !this.lines[i].visible;
         }
       },
+			showEvent: function(id) {
+				var day = this.eventsDays[id]
+				var message = day.date.getDate() + ' '
+					+ this.month_names[day.date.getMonth()].substr(0, 3) + ' '
+					+ day.date.getFullYear() + '\n'
+					+ day.events.join('\n')
+				alert(message)
+			}
     },
   })
 }
