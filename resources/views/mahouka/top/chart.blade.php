@@ -31,6 +31,7 @@
 		{
 			description: '{{ ($event['series'] !== null ? $event['series'].": " : "").$event['name'] }}',
 			date: new Date('{{ $event['date'] }}'),
+			type: '{{ $event['type'] }}',
 			important: {{ $event['important'] ? 'true' : 'false' }},
 			color: '#{{ $event['color'] }}',
 		},
@@ -65,8 +66,13 @@
         >
 				<g transform="translate(0, 5)">
 					<g>
-						<template v-for="(day, index) in eventsDays">
-							<rect v-for="event in day.events" @click="showEvent(index)" class="event" :class="{important: event.important}" :fill="event.color" :x="day.x" y="0" :width="day_width" :height="sizeY" />
+						<template v-for="day in eventsDays">
+							<template v-for="(event, index) in day.events">
+								<text @click="showEvent(event.id)" class="event" :class="{important: event.important}" :fill="event.color" :x="day.x" :y="11 + index * 10" text-anchor="middle">
+									@{{ event.type }}
+								</text>
+								<line class="event" :class="{important: event.important}" :stroke="event.color" :x1="day.x" :y1="day.events.length * 10 + 4" :x2="day.x" :y2="sizeY" />
+							</template>
 						</template>
 					</g>
 	        <g class="chart-grid">
