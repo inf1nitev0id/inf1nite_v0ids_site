@@ -169,11 +169,7 @@
 		<div class="modal-substrate" @click="selected_event = null"></div>
 		<div class="modal-window card">
 			<p class="card-header">
-				@{{
-					selected_event.date.getDate() + ' '
-					+ month_names[selected_event.date.getMonth()].substr(0, 3) + ' '
-					+ selected_event.date.getFullYear() + '\n'
-				}}
+				@{{ dateToString(selected_event.date) }}
 			</p>
 			<div class="card-body" v-html="selected_event.name.replace('\n', '<br />')"></div>
 		</div>
