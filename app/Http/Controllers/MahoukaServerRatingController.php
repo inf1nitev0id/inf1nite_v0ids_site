@@ -364,11 +364,39 @@ class MahoukaServerRatingController extends Controller
       $lines[] = $line;
     }
 
+		$events = MahoukaServerEvent::getEvents();
+		$series = MahoukaSeries::getSeries();
+		$series_i = [];
+		foreach ($series as $i => $s) {
+			$series_i[$s['id']] = [
+				'id' => $i,
+				'name' =>	$s['name'],
+				'color' => $s['color']
+			];
+		}
+		foreach ($events as &$event) {
+			$event['name'] = str_replace(["\r\n", "\r", "\n"], '\\n', $event['name']);
+			if ($event['series_id'] !== null) {
+				$event['series_id'] = $series_i[$event['series_id']]['id'];
+			}
+			switch ($event['type']) {
+				case 'release':
+					$event['type'] = 0;
+					break;
+				case 'announcement':
+					$event['type'] = 1;
+					break;
+				default:
+					$event['type'] = 2;
+					break;
+			}
+		}
+
     return view('mahouka.top.chart', [
       'dates' => $dates,
       'lines' => $lines,
-			'events' => MahoukaServerEvent::getEvents(),
-			// 'series' => MahoukaSeries::getSeries()
+			'events' => $events,
+			'series' => $series
     ]);
   }
 }

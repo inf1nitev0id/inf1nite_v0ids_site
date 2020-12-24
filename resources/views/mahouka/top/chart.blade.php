@@ -29,11 +29,20 @@
 	var events = [
 	@foreach ($events as $event)
 		{
-			description: '{{ ($event['series'] !== null ? $event['series'].": " : "").$event['name'] }}',
+			name: '{{ $event['name'] }}',
 			date: new Date('{{ $event['date'] }}'),
-			type: '{{ $event['type'] }}',
+			type: {{ $event['type'] }},
+			series_id: {{ $event['series_id'] ?? 'null' }},
 			important: {{ $event['important'] ? 'true' : 'false' }},
-			color: '#{{ $event['color'] }}',
+		},
+	@endforeach
+	]
+	var series = [
+	@foreach ($series as $s)
+		{
+			name: '{{ $s['name'] }}',
+			color: '#{{ $s['color'] }}',
+			visible: true
 		},
 	@endforeach
 	]
@@ -68,7 +77,7 @@
 					<g>
 						<template v-for="day in eventsDays">
 							<template v-for="(event, index) in day.events">
-								<text @click="showEvent(event.id)" class="event" :class="{important: event.important}" :fill="event.color" :x="day.x" :y="11 + index * 10" text-anchor="middle">
+								<text @click="selected_event = event; selected_event.date = day.date" class="event" :class="{important: event.important}" :fill="event.color" :x="day.x" :y="11 + index * 10" text-anchor="middle">
 									@{{ event.type }}
 								</text>
 								<line class="event" :class="{important: event.important}" :stroke="event.color" :x1="day.x" :y1="day.events.length * 10 + 4" :x2="day.x" :y2="sizeY" />
@@ -116,16 +125,58 @@
 	    </div>
 	  </div>
 	</div>
-  <div v-cloak>
-    <div v-for="line in lines" class="btn-group m-1">
-      <div class="btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="setSelected(line.user.id)">
-        @{{ line.user.name }}
-      </div>
-      <div class="btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="line.visible = !line.visible">
-        <i v-if="line.visible" class="far fa-check-square"></i>
-        <i v-else class="far fa-square"></i>
-      </div>
-    </div>
+	<ul class="nav nav-tabs">
+		<li class="nav-item">
+			<a class="nav-link active" data-toggle="tab" href="#users">Пользователи</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link"	data-toggle="tab" href="#events">События</a>
+		</li>
+	</ul>
+  <div v-cloak class="tab-content">
+		<div class="tab-pane fade show active" id="users">
+	    <div v-for="line in lines" class="btn-group m-1">
+	      <div class="btn option-btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="setSelected(line.user.id)">
+	        @{{ line.user.name }}
+	      </div>
+	      <div class="btn" :class="'btn-outline-' + (selected == line.user.id ? 'secondary' : 'light')" :style="{color: line.color}" @click="line.visible = !line.visible">
+	        <i v-if="line.visible" class="far fa-check-square"></i>
+	        <i v-else class="far fa-square"></i>
+	      </div>
+	    </div>
+		</div>
+		<div class="tab-pane fade" id="events">
+			<p class="mt-1 mb-1">Серии:</p>
+			<div v-for="serie in series" class="option" :style="{color: serie.color}" @click="serie.visible = !serie.visible">
+				<i v-if="serie.visible" class="far fa-check-square"></i>
+				<i v-else class="far fa-square"></i>
+				@{{ serie.name }}
+			</div>
+			<p class="mt-2 mb-1">Категории:</p>
+			<div v-for="type in types" class="option" :style="{color: type.color}" @click="type.visible = !type.visible">
+				<i v-if="type.visible" class="far fa-check-square"></i>
+				<i v-else class="far fa-square"></i>
+				@{{ type.name }}
+			</div>
+			<div class="option mt-2" @click="important_only = !important_only">
+				<i v-if="important_only" class="far fa-check-square"></i>
+				<i v-else class="far fa-square"></i>
+				Только важные
+			</div>
+		</div>
   </div>
+	<div v-cloak v-if="selected_event !== null">
+		<div class="modal-substrate" @click="selected_event = null"></div>
+		<div class="modal-window card">
+			<p class="card-header">
+				@{{
+					selected_event.date.getDate() + ' '
+					+ month_names[selected_event.date.getMonth()].substr(0, 3) + ' '
+					+ selected_event.date.getFullYear() + '\n'
+				}}
+			</p>
+			<div class="card-body" v-html="selected_event.name.replace('\n', '<br />')"></div>
+		</div>
+	</div>
 </div>
 @endsection
