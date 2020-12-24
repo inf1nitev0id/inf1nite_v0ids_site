@@ -275,6 +275,11 @@ window.onload = function () {
           this.lines[i].visible = !this.lines[i].visible;
         }
       },
+			dateToString: function(date) {
+				day = date.getDate()
+				month = date.getMonth() + 1
+				return (day < 10 ? '0' + day : day) + '.' + (month < 10 ? '0' + month : month) + '.' + date.getFullYear()
+			}
     },
   })
 }

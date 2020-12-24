@@ -383,6 +383,11 @@ window.onload = function () {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = !this.lines[i].visible;
         }
+      },
+      dateToString: function dateToString(date) {
+        day = date.getDate();
+        month = date.getMonth() + 1;
+        return (day < 10 ? '0' + day : day) + '.' + (month < 10 ? '0' + month : month) + '.' + date.getFullYear();
       }
     }
   });
