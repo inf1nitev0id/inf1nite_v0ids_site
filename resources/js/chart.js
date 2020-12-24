@@ -44,6 +44,17 @@ window.onload = function () {
       ],
     },
     created: function() {
+			this.dates.forEach((item, i) => {
+				this.dates[i] = new Date(item)
+			})
+			this.events_list.forEach(item => {
+				item.date = new Date(item.date)
+			})
+			this.series.forEach(item => {
+				item.color = '#' + item.color
+			});
+
+
       for (let i = 0; i < this.lines.length; i++) {
         this.lines[i].max = 0
         for (let j = 0; j < this.lines[i].rating.length; j++) {

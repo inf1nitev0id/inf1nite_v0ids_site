@@ -349,8 +349,10 @@ class MahoukaServerRatingController extends Controller
     }
 
     $lines = [];
+		$i = 0;
     foreach ($top['rating_table'] as $key => $row){
       $line = [];
+			$line['index'] = $i++;
       $line['user']['id'] = $key;
       $user = MahoukaServerUser::find($key);
       $line['user']['name'] = $user->name;
@@ -361,18 +363,22 @@ class MahoukaServerRatingController extends Controller
         $line['rating'][] = $row[$date][0] ?? null;
         $line['rating'][] = $row[$date][1] ?? null;
       }
+			$line['max'] = 0;
+			$line['visible'] = true;
+
       $lines[] = $line;
     }
 
 		$events = MahoukaServerEvent::getEvents();
 		$series = MahoukaSeries::getSeries();
 		$series_i = [];
-		foreach ($series as $i => $s) {
+		foreach ($series as $i => &$s) {
 			$series_i[$s['id']] = [
 				'id' => $i,
 				'name' =>	$s['name'],
 				'color' => $s['color']
 			];
+			$s['visible'] = true;
 		}
 		foreach ($events as &$event) {
 			$event['name'] = str_replace(["\r\n", "\r", "\n"], '\\n', $event['name']);

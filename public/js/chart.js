@@ -123,6 +123,18 @@ window.onload = function () {
       month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
     created: function created() {
+      var _this = this;
+
+      this.dates.forEach(function (item, i) {
+        _this.dates[i] = new Date(item);
+      });
+      this.events_list.forEach(function (item) {
+        item.date = new Date(item.date);
+      });
+      this.series.forEach(function (item) {
+        item.color = '#' + item.color;
+      });
+
       for (var i = 0; i < this.lines.length; i++) {
         this.lines[i].max = 0;
 

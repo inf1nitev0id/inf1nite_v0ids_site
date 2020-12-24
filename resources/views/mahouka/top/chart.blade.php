@@ -5,47 +5,14 @@
 @section('head')
 <link rel="stylesheet" href="/css/chart.css" />
 <script>
-  var dates = [
-  @foreach ($dates as $date)
-    new Date('{{ $date }}'),
-  @endforeach
-  ]
-  var lines = [
-  @foreach ($lines as $key => $line)
-    {
-			index: {{ $key }},
-      user: {
-        id: {{ $line['user']['id'] }},
-        name: '{{ $line['user']['name'] }}',
-        alias: '{{ $line['user']['alias'] }}'
-      },
-      rating: [@foreach ($line['rating'] as $rate){{ $rate ?? 'null' }}, @endforeach],
-      max: 0,
-      color: '{{ $line['color'] }}',
-      visible: true,
-    },
-  @endforeach
-  ]
-	var events = [
-	@foreach ($events as $event)
-		{
-			name: '{{ $event['name'] }}',
-			date: new Date('{{ $event['date'] }}'),
-			type: {{ $event['type'] }},
-			series_id: {{ $event['series_id'] ?? 'null' }},
-			important: {{ $event['important'] ? 'true' : 'false' }},
-		},
-	@endforeach
-	]
-	var series = [
-	@foreach ($series as $s)
-		{
-			name: '{{ $s['name'] }}',
-			color: '#{{ $s['color'] }}',
-			visible: true
-		},
-	@endforeach
-	]
+	var dates = @json($dates)
+
+	var lines = @json($lines)
+
+	var events = @json($events)
+
+	var series = @json($series)
+
 </script>
 <script src="/js/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
