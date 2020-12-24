@@ -1,23 +1,23 @@
 svg {
-  polyline.line {
+	polyline.line {
 		cursor: pointer;
-    stroke-width: 2;
-    fill: none;
-    &:hover {
-      stroke-width: 4;
-    }
-    &.selected {
-      stroke-width: 4;
+		stroke-width: 2;
+		fill: none;
+		&:hover {
+			stroke-width: 4;
+		}
+		&.selected {
+			stroke-width: 4;
 			animation: selected 2s infinite linear;
-    }
-  }
+		}
+	}
 
-  g.chart-grid line {
-    fill: none;
-    stroke-width: 1;
-    stroke: #DDD;
+	g.chart-grid line {
+		fill: none;
+		stroke-width: 1;
+		stroke: #DDD;
 		pointer-events: none;
-  }
+	}
 
 	text.rate-text {
 		pointer-events: none;
@@ -57,9 +57,9 @@ svg {
 }
 
 .axis-text {
-  color: #888;
-  fill: #888;
-  font-size: 12px;
+	color: #888;
+	fill: #888;
+	font-size: 12px;
 	pointer-events: none;
 }
 
@@ -73,8 +73,8 @@ svg {
 .modal-window {
 	position: fixed;
 	top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+	left: 50%;
+	transform: translate(-50%, -50%);
 	width: 90%;
 	max-width: 400px;
 

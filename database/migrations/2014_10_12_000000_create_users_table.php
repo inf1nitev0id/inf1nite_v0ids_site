@@ -6,35 +6,35 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->foreignId('invite_id')->nullable();
-            $table->enum('role', ['user', 'moderator', 'admin'])->default('user');
-            $table->rememberToken();
-            $table->timestamps();
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
+		Schema::create('users', function (Blueprint $table) {
+			$table->id();
+			$table->string('name')->unique();
+			$table->string('email')->unique();
+			$table->timestamp('email_verified_at')->nullable();
+			$table->string('password');
+			$table->foreignId('invite_id')->nullable();
+			$table->enum('role', ['user', 'moderator', 'admin'])->default('user');
+			$table->rememberToken();
+			$table->timestamps();
 
-            $table->foreign('invite_id')->references('id')->on('invites');
-        });
-    }
+			$table->foreign('invite_id')->references('id')->on('invites');
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('users');
-    }
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+		Schema::dropIfExists('users');
+	}
 }

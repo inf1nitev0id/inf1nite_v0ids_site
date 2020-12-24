@@ -123,6 +123,18 @@ window.onload = function () {
       month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
     created: function created() {
+      var _this = this;
+
+      this.dates.forEach(function (item, i) {
+        _this.dates[i] = new Date(item);
+      });
+      this.events_list.forEach(function (item) {
+        item.date = new Date(item.date);
+      });
+      this.series.forEach(function (item) {
+        item.color = '#' + item.color;
+      });
+
       for (var i = 0; i < this.lines.length; i++) {
         this.lines[i].max = 0;
 
@@ -132,12 +144,15 @@ window.onload = function () {
       }
     },
     computed: {
+      // ширина графика
       sizeX: function sizeX() {
         return this.dates.length * this.day_width;
       },
+      // высота графика
       sizeY: function sizeY() {
         return 600;
       },
+      // максимальный рейтинг
       maxRating: function maxRating() {
         var max = 0;
 
@@ -147,6 +162,7 @@ window.onload = function () {
 
         return max;
       },
+      // цена вертикального деления
       divisionValue: function divisionValue() {
         var number = this.maxRating;
         var power = 0;
@@ -168,23 +184,15 @@ window.onload = function () {
 
         return result * Math.pow(10, power);
       },
+      // округлённое максимальное значение рейтинга
       height: function height() {
         return Math.ceil(this.maxRating / this.divisionValue) * this.divisionValue;
       },
+      // масштаб рейтинга по отношению к размеру на экране
       scale: function scale() {
         return this.sizeY / this.height;
       },
-      notSelectedLines: function notSelectedLines() {
-        var selected = this.selected;
-
-        if (selected == 0) {
-          return this.lines;
-        } else {
-          return this.lines.filter(function (item) {
-            return item.user.id != selected;
-          });
-        }
-      },
+      // выбранный график
       selectedLine: function selectedLine() {
         var selected = this.selected;
 
@@ -196,6 +204,7 @@ window.onload = function () {
           });
         }
       },
+      // массив с расчитанными координатами для графиков
       chart: function chart() {
         var chart = new Array(this.lines.length);
 
@@ -246,6 +255,7 @@ window.onload = function () {
 
         return chart;
       },
+      // массив строк, составленных из координат
       points: function points() {
         var points = [];
 
@@ -261,6 +271,7 @@ window.onload = function () {
 
         return points;
       },
+      // массив ветикальных делений
       verticalDivisions: function verticalDivisions() {
         var xs = [];
 
@@ -273,6 +284,7 @@ window.onload = function () {
 
         return xs;
       },
+      // массив горизонтальных делений
       horizontalDivisions: function horizontalDivisions() {
         var ys = [];
 
@@ -285,6 +297,7 @@ window.onload = function () {
 
         return ys;
       },
+      // массив для шкалы месяцев
       months: function months() {
         var m = [];
         var start_x = 0;
@@ -315,6 +328,7 @@ window.onload = function () {
 
         return m;
       },
+      // массив событий, разбитых по дням
       eventsDays: function eventsDays() {
         var events = [];
         var day = 0;
@@ -359,6 +373,7 @@ window.onload = function () {
       }
     },
     methods: {
+      // установка активного графика
       setSelected: function setSelected(id) {
         if (this.selected == id) {
           this.selected = 0;
@@ -366,24 +381,29 @@ window.onload = function () {
           this.selected = id;
         }
       },
+      // проверка, находится ли надпись на достаточном расстоянии от низа графика
       isUp: function isUp(y, rate) {
         return -y < String(rate).length * 9;
       },
+      // отображение всех графиков
       showAll: function showAll() {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = true;
         }
       },
+      // сокрытие всех графиков
       hideAll: function hideAll() {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = false;
         }
       },
+      // инвертирование видимости графиков
       invert: function invert() {
         for (var i = 0; i < this.lines.length; i++) {
           this.lines[i].visible = !this.lines[i].visible;
         }
       },
+      // преобразование объекта даты в строку
       dateToString: function dateToString(date) {
         day = date.getDate();
         month = date.getMonth() + 1;
