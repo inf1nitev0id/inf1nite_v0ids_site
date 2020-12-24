@@ -203,6 +203,7 @@ window.onload = function () {
 						}
 					}
 					let event = {
+						id: i,
 						description: this.events_list[i].description,
 						color: this.events_list[i].color,
 						important: this.events_list[i].important,
@@ -210,12 +211,23 @@ window.onload = function () {
 							return this.description
 						}
 					}
+					switch (this.events_list[i].type) {
+						case 'release':
+							event.type = 'R';
+							break;
+						case 'announcement':
+							event.type = 'A';
+							break;
+						default:
+							event.type = 'O';
+							break;
+					}
 					if (same) {
 						events[events.length - 1].events.push(event)
 					} else {
 						events.push({
 							date: this.events_list[i].date,
-							x: day * this.day_width,
+							x: day * this.day_width + this.day_width / 2,
 							events: [
 								event
 							]
@@ -253,11 +265,11 @@ window.onload = function () {
         }
       },
 			showEvent: function(id) {
-				var day = this.eventsDays[id]
+				var day = this.events_list[id]
 				var message = day.date.getDate() + ' '
 					+ this.month_names[day.date.getMonth()].substr(0, 3) + ' '
 					+ day.date.getFullYear() + '\n'
-					+ day.events.join('\n')
+					+ day.description
 				alert(message)
 			}
     },
