@@ -7,6 +7,26 @@ window.onload = function () {
       lines: lines,
       dates: dates,
 			events_list: events,
+			types: [
+				{
+					name: 'Релиз (R)',
+					color: '#00A387',
+					visible: true
+				},
+				{
+					name: 'Анонс (A)',
+					color: '#60E6CF',
+					visible: true
+				},
+				{
+					name: 'Другое (O)',
+					color: '#888888',
+					visible: true
+				}
+			],
+			series: series,
+			important_only: false,
+			selected_event: null,
       selected: 0,
       month_names: [
         'январь',
@@ -195,44 +215,35 @@ window.onload = function () {
 				var day = 0
 				var same = false;
 				for (let i = 0; i < this.events_list.length; i++) {
-					while (this.dates[day] < this.events_list[i].date) {
-						day++
-						same = false
-						if (day == this.dates.length) {
-							return events
+					let e = this.events_list[i]
+					let s_id = e.series_id
+					if (this.types[e.type].visible && (s_id !== null ? this.series[s_id].visible : true) && (!this.important_only || e.important)) {
+						while (this.dates[day] < e.date) {
+							day++
+							same = false
+							if (day == this.dates.length) {
+								return events
+							}
 						}
-					}
-					let event = {
-						id: i,
-						description: this.events_list[i].description,
-						color: this.events_list[i].color,
-						important: this.events_list[i].important,
-						toString: function() {
-							return this.description
+						let event = {
+							id: i,
+							name: (s_id !== null ? this.series[s_id].name + ': ' : '') + e.name,
+							color: s_id !== null ? this.series[s_id].color : this.types[e.type].color,
+							important: e.important,
+							type: ['R', 'A', 'O'][e.type],
 						}
-					}
-					switch (this.events_list[i].type) {
-						case 'release':
-							event.type = 'R';
-							break;
-						case 'announcement':
-							event.type = 'A';
-							break;
-						default:
-							event.type = 'O';
-							break;
-					}
-					if (same) {
-						events[events.length - 1].events.push(event)
-					} else {
-						events.push({
-							date: this.events_list[i].date,
-							x: day * this.day_width + this.day_width / 2,
-							events: [
-								event
-							]
-						})
-						same = true
+						if (same) {
+							events[events.length - 1].events.push(event)
+						} else {
+							events.push({
+								date: e.date,
+								x: day * this.day_width + this.day_width / 2,
+								events: [
+									event
+								]
+							})
+							same = true
+						}
 					}
 				}
 				return events
@@ -264,14 +275,6 @@ window.onload = function () {
           this.lines[i].visible = !this.lines[i].visible;
         }
       },
-			showEvent: function(id) {
-				var day = this.events_list[id]
-				var message = day.date.getDate() + ' '
-					+ this.month_names[day.date.getMonth()].substr(0, 3) + ' '
-					+ day.date.getFullYear() + '\n'
-					+ day.description
-				alert(message)
-			}
     },
   })
 }
