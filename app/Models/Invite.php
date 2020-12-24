@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Invite extends Model
 {
-  use HasFactory;
+	use HasFactory;
 
-  public $timestamps = false;
+	public $timestamps = false;
 }
