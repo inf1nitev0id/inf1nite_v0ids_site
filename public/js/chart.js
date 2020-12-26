@@ -210,22 +210,17 @@ window.onload = function () {
 
         for (var index = 0; index < this.lines.length; index++) {
           var line = this.lines[index].rating;
-          var start = false;
           var prev = false;
           var last_y = void 0;
           var points = [];
 
           for (var i = 0; i < line.length; i++) {
-            if (line[i] !== null || start) {
-              if (!start) {
-                start = true;
-              }
-
+            if (line[i] !== null) {
               var x = void 0,
                   y = void 0;
               x = Math.floor(i / 2) * this.day_width + this.day_width / 4 + i % 2 * this.day_width / 2;
 
-              if (line[i] !== null && line[i] != last_y) {
+              if (line[i] != last_y) {
                 y = line[i] * this.scale;
                 last_y = line[i];
                 points.push({

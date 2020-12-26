@@ -153,7 +153,7 @@
 			<p class="card-header">
 				@{{ dateToString(selected_event.date) }}
 			</p>
-			<div class="card-body" v-html="selected_event.name.replace('\n', '<br />')"></div>
+			<div class="card-body" v-html="selected_event.name"></div>
 		</div>
 	</div>
 </div>
