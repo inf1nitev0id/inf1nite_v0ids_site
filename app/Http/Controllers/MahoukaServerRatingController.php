@@ -351,7 +351,6 @@ class MahoukaServerRatingController extends Controller
 // подготовка данных для отрисовки графика
 	public function chart() {
 		$top = $this->top();
-		$max_rate = MahoukaServerRating::select('rate')->orderBy('rate', 'desc')->first()->rate;
 
 		$dates = [];
 		for ($date = clone($top['min_date']); $date <= $top['max_date']; $date->add($top['step'])) {
@@ -369,9 +368,10 @@ class MahoukaServerRatingController extends Controller
 			$line['user']['alias'] = $user->alias;
 			$line['color'] = $this->getColor($key - 1);
 			$line['rating'] = [];
+			$prev = null;
 			foreach ($dates as $date) {
-				$line['rating'][] = $row[$date][0] ?? null;
-				$line['rating'][] = $row[$date][1] ?? null;
+				$prev = ($line['rating'][] = $row[$date][0] ?? $prev);
+				$prev = ($line['rating'][] = $row[$date][1] ?? $prev);
 			}
 			$line['max'] = 0;
 			$line['visible'] = true;
@@ -391,7 +391,7 @@ class MahoukaServerRatingController extends Controller
 			$s['visible'] = true;
 		}
 		foreach ($events as &$event) {
-			$event['name'] = str_replace(["\r\n", "\r", "\n"], '\\n', $event['name']);
+			$event['name'] = str_replace(["\r\n", "\r", "\n"], '<br />', $event['name']);
 			if ($event['series_id'] !== null) {
 				$event['series_id'] = $series_i[$event['series_id']]['id'];
 			}
