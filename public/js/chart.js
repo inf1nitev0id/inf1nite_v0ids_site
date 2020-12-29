@@ -175,8 +175,8 @@ window.onload = function () {
       dayWidth: function dayWidth() {
         return this.visibleDays > this.days ? this.chart_width / this.days : this.default_day_width;
       },
-      // массив максимальных значений рейтинга по дням
-      daysMax: function daysMax() {
+      // массив минимальных и максимальных значений рейтинга по дням
+      daysExt: function daysExt() {
         var d = [];
         var lines = this.lines.filter(function (item) {
           return item.visible;
@@ -185,34 +185,53 @@ window.onload = function () {
 
         for (var _day = 0; _day < this.days_full * 2; _day += 2) {
           if (is_empty) {
-            d.push(0);
+            d.push({
+              min: 0,
+              max: 0
+            });
           } else {
-            var max = Math.max(lines[0].rating[_day], lines[0].rating[_day + 1]);
+            var min = null;
+            var max = null;
 
-            for (var i = 1; i < lines.length; i++) {
-              var rate = Math.max(lines[i].rating[_day], lines[i].rating[_day + 1]);
-              if (rate > max) max = rate;
+            for (var i = 0; i < lines.length; i++) {
+              var min_rate = this.min(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              var max_rate = this.max(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              if (min === null || min_rate < min && min_rate !== null) min = min_rate;
+              if (max === null || max_rate > max && max_rate !== null) max = max_rate;
             }
 
-            d.push(max);
+            d.push({
+              min: min,
+              max: max
+            });
           }
         }
 
         return d;
       },
+      // минимальный рейтинг
+      minRating: function minRating() {
+        var min = null;
+
+        for (var i = 0; i < this.days; i++) {
+          if (min === null || this.daysExt[i + this.start_indent].min < min) min = this.daysExt[i + this.start_indent].min;
+        }
+
+        return min;
+      },
       // максимальный рейтинг
       maxRating: function maxRating() {
-        var max = this.daysMax[this.start_indent];
+        var max = null;
 
         for (var i = 1; i < this.days; i++) {
-          if (this.daysMax[i + this.start_indent] > max) max = this.daysMax[i + this.start_indent];
+          if (max === null || this.daysExt[i + this.start_indent].max > max) max = this.daysExt[i + this.start_indent].max;
         }
 
         return max;
       },
       // цена вертикального деления
       divisionValue: function divisionValue() {
-        var number = this.maxRating;
+        var number = this.maxRating - this.minRating;
         var power = 0;
         var result;
 
@@ -232,13 +251,17 @@ window.onload = function () {
 
         return result * Math.pow(10, power);
       },
-      // округлённое максимальное значение рейтинга
-      height: function height() {
+      // минимальное значение рейтинга с учётом цены деления
+      bottom: function bottom() {
+        return Math.floor(this.minRating / this.divisionValue) * this.divisionValue;
+      },
+      // максимальное значение рейтинга с учётом цены деления
+      top: function top() {
         return Math.ceil(this.maxRating / this.divisionValue) * this.divisionValue;
       },
       // масштаб рейтинга по отношению к размеру на экране
       scale: function scale() {
-        return this.sizeY / this.height;
+        return this.sizeY / (this.top - this.bottom);
       },
       // выбранный график
       selectedLine: function selectedLine() {
@@ -271,7 +294,7 @@ window.onload = function () {
               x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + this.dayWidth / 4 + i % 2 * this.dayWidth / 2;
 
               if (line[i] != last_y) {
-                y = line[i] * this.scale;
+                y = (line[i] - this.bottom) * this.scale;
                 last_y = line[i];
                 points.push({
                   x: Math.round(x),
@@ -281,7 +304,7 @@ window.onload = function () {
                 prev = true;
               } else {
                 if (prev) {
-                  y = last_y * this.scale;
+                  y = (last_y - this.bottom) * this.scale;
                   points.push({
                     x: Math.round(x),
                     y: -Math.round(y),
@@ -335,10 +358,10 @@ window.onload = function () {
       horizontalDivisions: function horizontalDivisions() {
         var ys = [];
 
-        for (var y = 0; y < this.height; y += this.divisionValue) {
+        for (var y = this.top; y > this.bottom; y -= this.divisionValue) {
           ys.push({
-            y: Math.round(y * this.scale),
-            value: this.height - y
+            y: Math.round((this.top - y) * this.scale),
+            value: y
           });
         }
 
@@ -453,6 +476,30 @@ window.onload = function () {
       // обновление размера графика при изменении размера окна
       updateChartWidth: function updateChartWidth() {
         this.chart_width = document.getElementById('page-title').offsetWidth - 2;
+      },
+      // возвращает меньшую переменную (в отличие от Math.min игнорирует null)
+      min: function min(a, b) {
+        if (a === null) {
+          return b;
+        } else if (b === null) {
+          return a;
+        } else if (a < b) {
+          return a;
+        } else {
+          return b;
+        }
+      },
+      // возвращает бальшую переменную (в отличие от Math.max игнорирует null)
+      max: function max(a, b) {
+        if (a === null) {
+          return b;
+        } else if (b === null) {
+          return a;
+        } else if (a > b) {
+          return a;
+        } else {
+          return b;
+        }
       },
       // установка активного графика
       setSelected: function setSelected(id) {

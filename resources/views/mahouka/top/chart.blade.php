@@ -24,8 +24,12 @@
 <div id="chart">
 	<p v-if="false">Для работы этой страницы необходим JS, если вы видете эту надпись, значит он не работает в вашем браузере.</p>
 	<div v-cloak style="position: relative;">
+{{-- подписи шкала рейтинга --}}
 		<div v-for="y in horizontalDivisions" class="axis-text" :style="{position: 'absolute', top: y.y + 5 + 'px', left: '5px'}">
 			@{{ y.value }}
+		</div>
+		<div class="axis-text" :style="{position: 'absolute', top: sizeY - 14 + 'px', left: '5px'}">
+			@{{ bottom }}
 		</div>
 		<div class="overflow">
 {{--
@@ -158,6 +162,7 @@
 			<select v-model="end_indent" class="form-control">
 				<option v-for="date in dates_full.filter(item => item.id >= start_indent)" :value="days_full - date.id - 1">@{{ date.full }}</option>
 			</select>
+			<div class="btn btn-outline-secondary" @click="start_indent = 0; end_indent = 0">Сброс</div>
 		</div>
 	</div>
 {{-- модальное окно для вывода информации о выбранном событии --}}
