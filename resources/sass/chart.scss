@@ -48,12 +48,16 @@ svg {
 			stroke-width: 4;
 		}
 	}
-
 }
 
 @keyframes selected {
 	0% {}
 	50% {stroke: #EEE;}
+}
+
+.overflow {
+	border-left: 1px solid #DDD;
+	border-right: 1px solid #DDD;
 }
 
 .axis-text {

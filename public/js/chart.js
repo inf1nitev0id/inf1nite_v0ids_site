@@ -99,9 +99,13 @@ window.onload = function () {
   vm = new Vue({
     el: '#chart',
     data: {
-      day_width: 20,
+      chart_width: 0,
+      default_day_width: 20,
       lines: lines,
-      dates: dates,
+      min_date: min_date,
+      max_date: max_date,
+      start_indent: 0,
+      end_indent: 0,
       events_list: events,
       types: [{
         name: 'Релиз (R)',
@@ -123,11 +127,8 @@ window.onload = function () {
       month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
     },
     created: function created() {
-      var _this = this;
-
-      this.dates.forEach(function (item, i) {
-        _this.dates[i] = new Date(item);
-      });
+      window.addEventListener('resize', this.updateChartWidth);
+      this.updateChartWidth();
       this.events_list.forEach(function (item) {
         item.date = new Date(item.date);
       });
@@ -144,31 +145,97 @@ window.onload = function () {
       }
     },
     computed: {
+      // количество дней
+      days_full: function days_full() {
+        return Math.round((this.max_date - this.min_date) / 24 / 60 / 60 / 1000) + 1;
+      },
+      // количество дней между выбранными датами
+      days: function days() {
+        return this.days_full - this.start_indent - this.end_indent;
+      },
+      // начальная дата с учётом отступа
+      startDate: function startDate() {
+        var date = new Date(this.min_date);
+        date.setDate(date.getDate() + this.start_indent);
+        return date;
+      },
       // ширина графика
       sizeX: function sizeX() {
-        return this.dates.length * this.day_width;
+        return this.days * this.dayWidth;
       },
       // высота графика
       sizeY: function sizeY() {
         return 600;
       },
+      // количество дней стандартной ширины, помещабщихся в видимой части графика
+      visibleDays: function visibleDays() {
+        return this.chart_width / this.default_day_width;
+      },
+      // ширина дня
+      dayWidth: function dayWidth() {
+        return this.visibleDays > this.days ? this.chart_width / this.days : this.default_day_width;
+      },
+      // массив минимальных и максимальных значений рейтинга по дням
+      daysExt: function daysExt() {
+        var d = [];
+        var lines = this.lines.filter(function (item) {
+          return item.visible;
+        });
+        var is_empty = lines.length == 0;
+
+        for (var _day = 0; _day < this.days_full * 2; _day += 2) {
+          if (is_empty) {
+            d.push({
+              min: 0,
+              max: 0
+            });
+          } else {
+            var min = null;
+            var max = null;
+
+            for (var i = 0; i < lines.length; i++) {
+              var min_rate = this.min(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              var max_rate = this.max(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              if (min === null || min_rate < min && min_rate !== null) min = min_rate;
+              if (max === null || max_rate > max && max_rate !== null) max = max_rate;
+            }
+
+            d.push({
+              min: min,
+              max: max
+            });
+          }
+        }
+
+        return d;
+      },
+      // минимальный рейтинг
+      minRating: function minRating() {
+        var min = null;
+
+        for (var i = 0; i < this.days; i++) {
+          if (min === null || this.daysExt[i + this.start_indent].min < min) min = this.daysExt[i + this.start_indent].min;
+        }
+
+        return min;
+      },
       // максимальный рейтинг
       maxRating: function maxRating() {
-        var max = 0;
+        var max = null;
 
-        for (var i = 0; i < this.lines.length; i++) {
-          if (this.lines[i].visible && this.lines[i].max > max) max = this.lines[i].max;
+        for (var i = 1; i < this.days; i++) {
+          if (max === null || this.daysExt[i + this.start_indent].max > max) max = this.daysExt[i + this.start_indent].max;
         }
 
         return max;
       },
       // цена вертикального деления
       divisionValue: function divisionValue() {
-        var number = this.maxRating;
+        var number = this.maxRating - this.minRating;
         var power = 0;
         var result;
 
-        while ((number = Math.floor(number / 10)) >= 10) {
+        while ((number = number / 10) >= 10) {
           power++;
         }
 
@@ -184,13 +251,17 @@ window.onload = function () {
 
         return result * Math.pow(10, power);
       },
-      // округлённое максимальное значение рейтинга
-      height: function height() {
+      // минимальное значение рейтинга с учётом цены деления
+      bottom: function bottom() {
+        return Math.floor(this.minRating / this.divisionValue) * this.divisionValue;
+      },
+      // максимальное значение рейтинга с учётом цены деления
+      top: function top() {
         return Math.ceil(this.maxRating / this.divisionValue) * this.divisionValue;
       },
       // масштаб рейтинга по отношению к размеру на экране
       scale: function scale() {
-        return this.sizeY / this.height;
+        return this.sizeY / (this.top - this.bottom);
       },
       // выбранный график
       selectedLine: function selectedLine() {
@@ -213,15 +284,17 @@ window.onload = function () {
           var prev = false;
           var last_y = void 0;
           var points = [];
+          var is_start = this.start_indent == 0;
+          var is_end = this.end_indent == 0;
 
-          for (var i = 0; i < line.length; i++) {
+          for (var i = 0 + (this.start_indent - !is_start) * 2; i < line.length - (this.end_indent - !is_end) * 2; i++) {
             if (line[i] !== null) {
               var x = void 0,
                   y = void 0;
-              x = Math.floor(i / 2) * this.day_width + this.day_width / 4 + i % 2 * this.day_width / 2;
+              x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + this.dayWidth / 4 + i % 2 * this.dayWidth / 2;
 
               if (line[i] != last_y) {
-                y = line[i] * this.scale;
+                y = (line[i] - this.bottom) * this.scale;
                 last_y = line[i];
                 points.push({
                   x: Math.round(x),
@@ -231,7 +304,7 @@ window.onload = function () {
                 prev = true;
               } else {
                 if (prev) {
-                  y = last_y * this.scale;
+                  y = (last_y - this.bottom) * this.scale;
                   points.push({
                     x: Math.round(x),
                     y: -Math.round(y),
@@ -269,12 +342,14 @@ window.onload = function () {
       // массив ветикальных делений
       verticalDivisions: function verticalDivisions() {
         var xs = [];
+        var date = new Date(this.startDate);
 
-        for (var i = 0; i < this.dates.length; i++) {
+        for (var i = 0; i < this.days; i++) {
           xs.push({
-            x: i * this.day_width,
-            y: i == 0 ? 0 : this.sizeY + 15 + (this.dates[i].getDate() == 1 ? 15 : 0)
+            x: i * this.dayWidth,
+            y: i == 0 ? 0 : this.sizeY + 15 + (date.getDate() == 1 ? 15 : 0)
           });
+          date.setDate(date.getDate() + 1);
         }
 
         return xs;
@@ -283,26 +358,39 @@ window.onload = function () {
       horizontalDivisions: function horizontalDivisions() {
         var ys = [];
 
-        for (var y = 0; y < this.height; y += this.divisionValue) {
+        for (var y = this.top; y > this.bottom; y -= this.divisionValue) {
           ys.push({
-            y: Math.round(y * this.scale),
-            value: this.height - y
+            y: Math.round((this.top - y) * this.scale),
+            value: y
           });
         }
 
         return ys;
       },
+      // массив для шкалы дат
+      dates: function dates() {
+        var d = [];
+        var date = new Date(this.startDate);
+
+        for (var i = 0; i < this.days; i++) {
+          d.push(date.getDate());
+          date.setDate(date.getDate() + 1);
+        }
+
+        return d;
+      },
       // массив для шкалы месяцев
       months: function months() {
         var m = [];
         var start_x = 0;
-        var month = this.dates[0].getMonth();
+        var date = new Date(this.startDate);
+        var month = date.getMonth();
 
-        for (var i = 1; i < this.dates.length; i++) {
-          var date = this.dates[i];
+        for (var i = 1; i < this.days; i++) {
+          date.setDate(date.getDate() + 1);
 
           if (date.getMonth() != month) {
-            var length = i * this.day_width - start_x;
+            var length = i * this.dayWidth - start_x;
             m.push({
               x: start_x + length / 2,
               text: length < 60 ? this.month_names[month].substr(0, 3) : this.month_names[month] + (length >= 100 ? ' ' + date.getFullYear() : '')
@@ -311,8 +399,8 @@ window.onload = function () {
             month = date.getMonth();
           }
 
-          if (i + 1 == this.dates.length) {
-            var _length = (i + 1) * this.day_width - start_x;
+          if (i + 1 == this.days) {
+            var _length = (i + 1) * this.dayWidth - start_x;
 
             m.push({
               x: start_x + _length / 2,
@@ -327,18 +415,20 @@ window.onload = function () {
       eventsDays: function eventsDays() {
         var events = [];
         var day = 0;
+        var date = new Date(this.startDate);
         var same = false;
 
         for (var i = 0; i < this.events_list.length; i++) {
           var e = this.events_list[i];
           var s_id = e.series_id;
 
-          if (this.types[e.type].visible && (s_id !== null ? this.series[s_id].visible : true) && (!this.important_only || e.important)) {
-            while (this.dates[day] < e.date) {
+          if (date <= e.date && this.types[e.type].visible && (s_id !== null ? this.series[s_id].visible : true) && (!this.important_only || e.important)) {
+            while (date < e.date) {
               day++;
+              date.setDate(date.getDate() + 1);
               same = false;
 
-              if (day == this.dates.length) {
+              if (date > this.end_date) {
                 return events;
               }
             }
@@ -356,7 +446,7 @@ window.onload = function () {
             } else {
               events.push({
                 date: e.date,
-                x: day * this.day_width + this.day_width / 2,
+                x: day * this.dayWidth + this.dayWidth / 2,
                 events: [event]
               });
               same = true;
@@ -365,9 +455,52 @@ window.onload = function () {
         }
 
         return events;
+      },
+      // массив дат для выбора диапазона
+      dates_full: function dates_full() {
+        var d = [];
+        var date = new Date(this.min_date);
+
+        for (var i = 0; i < this.days_full; i++) {
+          d.push({
+            id: i,
+            full: this.dateToString(date)
+          });
+          date.setDate(date.getDate() + 1);
+        }
+
+        return d;
       }
     },
     methods: {
+      // обновление размера графика при изменении размера окна
+      updateChartWidth: function updateChartWidth() {
+        this.chart_width = document.getElementById('page-title').offsetWidth - 2;
+      },
+      // возвращает меньшую переменную (в отличие от Math.min игнорирует null)
+      min: function min(a, b) {
+        if (a === null) {
+          return b;
+        } else if (b === null) {
+          return a;
+        } else if (a < b) {
+          return a;
+        } else {
+          return b;
+        }
+      },
+      // возвращает бальшую переменную (в отличие от Math.max игнорирует null)
+      max: function max(a, b) {
+        if (a === null) {
+          return b;
+        } else if (b === null) {
+          return a;
+        } else if (a > b) {
+          return a;
+        } else {
+          return b;
+        }
+      },
       // установка активного графика
       setSelected: function setSelected(id) {
         if (this.selected == id) {
