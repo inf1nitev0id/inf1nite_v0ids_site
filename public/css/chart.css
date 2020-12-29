@@ -65,6 +65,11 @@ svg line.event.important {
   }
 }
 
+.overflow {
+  border-left: 1px solid #DDD;
+  border-right: 1px solid #DDD;
+}
+
 .axis-text {
   color: #888;
   fill: #888;

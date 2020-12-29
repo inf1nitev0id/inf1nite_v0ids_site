@@ -57,7 +57,7 @@ table.rating tr:not(:first-child):nth-child(even) {
 }
 
 .overflow {
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 [v-cloak] {

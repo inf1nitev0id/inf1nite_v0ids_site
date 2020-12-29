@@ -373,7 +373,6 @@ class MahoukaServerRatingController extends Controller
 				$prev = ($line['rating'][] = $row[$date][0] ?? $prev);
 				$prev = ($line['rating'][] = $row[$date][1] ?? $prev);
 			}
-			$line['max'] = 0;
 			$line['visible'] = true;
 
 			$lines[] = $line;
@@ -409,7 +408,8 @@ class MahoukaServerRatingController extends Controller
 		}
 
 		return view('mahouka.top.chart', [
-			'dates' => $dates,
+			'min_date' => $top['min_date']->format('Y-m-d'),
+			'max_date' => $top['max_date']->format('Y-m-d'),
 			'lines' => $lines,
 			'events' => $events,
 			'series' => $series

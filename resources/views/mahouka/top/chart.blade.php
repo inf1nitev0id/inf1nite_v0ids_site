@@ -5,8 +5,8 @@
 @section('head')
 <link rel="stylesheet" href="/css/chart.css" />
 <script>
-	var dates = @json($dates)
-
+	var min_date = new Date('{{ $min_date }}')
+	var max_date = new Date('{{ $max_date }}')
 	var lines = @json($lines)
 
 	var events = @json($events)
@@ -20,7 +20,7 @@
 @endsection
 
 @section('content')
-<h5>Статистика сервера <a href="{{ route('mahouka.top.table') }}">Таблица</a></h5>
+<h5 id="page-title">Статистика сервера <a href="{{ route('mahouka.top.table') }}">Таблица</a></h5>
 <div id="chart">
 	<p v-if="false">Для работы этой страницы необходим JS, если вы видете эту надпись, значит он не работает в вашем браузере.</p>
 	<div v-cloak style="position: relative;">
@@ -62,8 +62,8 @@
 						<line x1="0" :y1="sizeY" :x2="sizeX" :y2="sizeY" />
 						<line x1="0" :y1="sizeY + 15" :x2="sizeX" :y2="sizeY + 15" />
 						<line x1="0" :y1="sizeY + 30" :x2="sizeX" :y2="sizeY + 30" />
-						<text v-for="(date, index) in dates" class="axis-text" :x="index * day_width + day_width / 2" :y="sizeY + 13" text-anchor="middle">
-							@{{ date.getDate() }}
+						<text v-for="(date, index) in dates" class="axis-text" :x="index * dayWidth + dayWidth / 2" :y="sizeY + 13" text-anchor="middle">
+							@{{ date }}
 						</text>
 						<text v-for="month in months" class="axis-text" :x="month.x" :y="sizeY + 28" text-anchor="middle">
 							@{{ month.text }}
@@ -111,6 +111,9 @@
 		<li class="nav-item">
 			<a class="nav-link"	data-toggle="tab" href="#events">События</a>
 		</li>
+		<li class="nav-item">
+			<a class="nav-link"	data-toggle="tab" href="#range">Диапазон</a>
+		</li>
 	</ul>
 	<div v-cloak class="tab-content">
 		<div class="tab-pane fade show active" id="users">
@@ -144,6 +147,17 @@
 				<i v-else class="far fa-square"></i>
 				Только важные
 			</div>
+		</div>
+		<div class="tab-pane fade form-inline pt-2" id="range">
+{{-- фильтр диапазона --}}
+			от
+			<select v-model="start_indent" class="form-control">
+				<option v-for="date in dates_full.filter(item => item.id < days_full - end_indent)" :value="date.id">@{{ date.full }}</option>
+			</select>
+			до
+			<select v-model="end_indent" class="form-control">
+				<option v-for="date in dates_full.filter(item => item.id >= start_indent)" :value="days_full - date.id - 1">@{{ date.full }}</option>
+			</select>
 		</div>
 	</div>
 {{-- модальное окно для вывода информации о выбранном событии --}}
