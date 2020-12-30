@@ -223,7 +223,7 @@ window.onload = function () {
       maxRating: function maxRating() {
         var max = null;
 
-        for (var i = 1; i < this.days; i++) {
+        for (var i = 0; i < this.days; i++) {
           if (max === null || this.daysExt[i + this.start_indent].max > max) max = this.daysExt[i + this.start_indent].max;
         }
 

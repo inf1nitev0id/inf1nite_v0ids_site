@@ -133,7 +133,7 @@ window.onload = function () {
 // максимальный рейтинг
 			maxRating: function() {
 				var max = null
-				for (let i = 1; i < this.days; i++) {
+				for (let i = 0; i < this.days; i++) {
 					if (max === null || this.daysExt[i + this.start_indent].max > max)
 						max = this.daysExt[i + this.start_indent].max
 				}
