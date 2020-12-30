@@ -106,6 +106,14 @@
 				<i class="far fa-eye-slash"></i>
 			</div>
 		</div>
+		<div class="btn-group m-1">
+			<div class="btn btn-outline-secondary" :class="{active: changes_mode}" title="Режим изменений" @click="changes_mode = !changes_mode">
+				<i class="fas fa-chart-line"></i>
+			</div>
+			<div v-if="changes_mode" class="btn btn-outline-secondary" :class="{active: day_mode}" title="Суммировать значения за день" @click="day_mode = !day_mode">
+				<i class="fas fa-calendar-day"></i>
+			</div>
+		</div>
 	</div>
 {{-- подробные настройки --}}
 	<ul class="nav nav-tabs">

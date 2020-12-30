@@ -124,7 +124,9 @@ window.onload = function () {
       important_only: false,
       selected_event: null,
       selected: 0,
-      month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+      month_names: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+      changes_mode: false,
+      day_mode: false
     },
     created: function created() {
       window.addEventListener('resize', this.updateChartWidth);
@@ -148,6 +150,36 @@ window.onload = function () {
       // количество дней
       days_full: function days_full() {
         return Math.round((this.max_date - this.min_date) / 24 / 60 / 60 / 1000) + 1;
+      },
+      // график изменений
+      changes: function changes() {
+        var c = [];
+
+        for (var l = 0; l < this.lines.length; l++) {
+          var line = this.lines[l].rating;
+          var changes = {
+            id: l,
+            rating: []
+          };
+
+          for (var i = 0; i < this.days_full * 2; i += 2) {
+            if (i > 0 && line[i - 1] !== null) {
+              changes.rating.push(line[i] - line[i - 1]);
+            } else {
+              changes.rating.push(null);
+            }
+
+            if (line[i] !== null) {
+              changes.rating.push(line[i + 1] - line[i]);
+            } else {
+              changes.rating.push(line[i + 1]);
+            }
+          }
+
+          c.push(changes);
+        }
+
+        return c;
       },
       // количество дней между выбранными датами
       days: function days() {
@@ -177,8 +209,12 @@ window.onload = function () {
       },
       // массив минимальных и максимальных значений рейтинга по дням
       daysExt: function daysExt() {
+        var _this = this;
+
         var d = [];
-        var lines = this.lines.filter(function (item) {
+        var lines = this.changes_mode ? this.changes.filter(function (item) {
+          return _this.lines[item.id].visible;
+        }) : this.lines.filter(function (item) {
           return item.visible;
         });
         var is_empty = lines.length == 0;
@@ -194,8 +230,8 @@ window.onload = function () {
             var max = null;
 
             for (var i = 0; i < lines.length; i++) {
-              var min_rate = this.min(lines[i].rating[_day], lines[i].rating[_day + 1]);
-              var max_rate = this.max(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              var min_rate = this.changes_mode && this.day_mode ? lines[i].rating[_day] + lines[i].rating[_day + 1] : this.min(lines[i].rating[_day], lines[i].rating[_day + 1]);
+              var max_rate = this.changes_mode && this.day_mode ? lines[i].rating[_day] + lines[i].rating[_day + 1] : this.max(lines[i].rating[_day], lines[i].rating[_day + 1]);
               if (min === null || min_rate < min && min_rate !== null) min = min_rate;
               if (max === null || max_rate > max && max_rate !== null) max = max_rate;
             }
@@ -280,7 +316,7 @@ window.onload = function () {
         var chart = new Array(this.lines.length);
 
         for (var index = 0; index < this.lines.length; index++) {
-          var line = this.lines[index].rating;
+          var line = this.changes_mode ? this.changes[index].rating : this.lines[index].rating;
           var prev = false;
           var last_y = void 0;
           var points = [];
@@ -288,18 +324,21 @@ window.onload = function () {
           var is_end = this.end_indent == 0;
 
           for (var i = 0 + (this.start_indent - !is_start) * 2; i < line.length - (this.end_indent - !is_end) * 2; i++) {
-            if (line[i] !== null) {
+            if (this.changes_mode && this.day_mode) i++;
+            var rate = this.changes_mode && this.day_mode ? line[i] + line[i - 1] : line[i];
+
+            if (rate !== null) {
               var x = void 0,
                   y = void 0;
-              x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + this.dayWidth / 4 + i % 2 * this.dayWidth / 2;
+              x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + (this.changes_mode ? i % 2 * this.dayWidth / 2 : this.dayWidth / 4 + i % 2 * this.dayWidth / 2);
 
-              if (line[i] != last_y) {
-                y = (line[i] - this.bottom) * this.scale;
-                last_y = line[i];
+              if (rate != last_y) {
+                y = (rate - this.bottom) * this.scale;
+                last_y = rate;
                 points.push({
                   x: Math.round(x),
                   y: -Math.round(y),
-                  rate: line[i]
+                  rate: rate
                 });
                 prev = true;
               } else {
