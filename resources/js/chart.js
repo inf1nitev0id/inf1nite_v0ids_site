@@ -46,6 +46,8 @@ window.onload = function () {
 				'ноябрь',
 				'декабрь',
 			],
+			changes_mode: false,
+			day_mode: false,
 		},
 		created: function() {
 			window.addEventListener('resize', this.updateChartWidth);
@@ -70,6 +72,31 @@ window.onload = function () {
 // количество дней
 			days_full: function() {
 				return Math.round((this.max_date - this.min_date) / 24 / 60 / 60 / 1000) + 1
+			},
+// график изменений
+			changes: function() {
+				var c = []
+				for (let l = 0; l < this.lines.length; l++) {
+					let line = this.lines[l].rating
+					let changes = {
+						id: l,
+						rating: []
+					}
+					for (let i = 0; i < this.days_full * 2; i += 2) {
+						if (i > 0 && line[i - 1] !== null) {
+							changes.rating.push(line[i] - line[i - 1])
+						} else {
+							changes.rating.push(null)
+						}
+						if (line[i] !== null) {
+							changes.rating.push(line[i + 1] - line[i])
+						} else {
+							changes.rating.push(line[i + 1])
+						}
+					}
+					c.push(changes)
+				}
+				return c
 			},
 // количество дней между выбранными датами
 			days: function() {
@@ -100,7 +127,9 @@ window.onload = function () {
 // массив минимальных и максимальных значений рейтинга по дням
 			daysExt: function() {
 				var d = []
-				var lines = this.lines.filter(item => item.visible)
+				var lines = this.changes_mode
+					? this.changes.filter(item => this.lines[item.id].visible)
+					: this.lines.filter(item => item.visible)
 				var is_empty = lines.length == 0
 				for (let day = 0; day < this.days_full * 2; day += 2) {
 					if (is_empty) {
@@ -109,8 +138,12 @@ window.onload = function () {
 						let min = null
 						let max = null
 						for (let i = 0; i < lines.length; i++) {
-							let min_rate = this.min(lines[i].rating[day], lines[i].rating[day + 1])
-							let max_rate = this.max(lines[i].rating[day], lines[i].rating[day + 1])
+							let min_rate = this.changes_mode && this.day_mode
+								? lines[i].rating[day] + lines[i].rating[day + 1]
+								: this.min(lines[i].rating[day], lines[i].rating[day + 1])
+							let max_rate = this.changes_mode && this.day_mode
+								? lines[i].rating[day] + lines[i].rating[day + 1]
+								: this.max(lines[i].rating[day], lines[i].rating[day + 1])
 							if (min === null || min_rate < min && min_rate !== null)
 								min = min_rate
 							if (max === null || max_rate > max && max_rate !== null)
@@ -185,23 +218,29 @@ window.onload = function () {
 			chart: function() {
 				var chart = new Array(this.lines.length)
 				for (let index = 0; index < this.lines.length; index++) {
-					let line = this.lines[index].rating
+					let line = this.changes_mode
+						? this.changes[index].rating
+						: this.lines[index].rating
 					let prev = false
 					let last_y
 					let points = []
 					let is_start = this.start_indent == 0
 					let is_end = this.end_indent == 0
 					for (let i = 0 + (this.start_indent - !is_start) * 2; i < line.length - (this.end_indent - !is_end) * 2; i++) {
-						if (line[i] !== null) {
+						if (this.changes_mode && this.day_mode) i++
+						let rate = this.changes_mode && this.day_mode ? line[i] + line[i - 1] : line[i]
+						if (rate !== null) {
 							let x, y
-							x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + this.dayWidth / 4 + i % 2 * this.dayWidth / 2
-							if (line[i] != last_y) {
-								y = (line[i] - this.bottom) * this.scale
-								last_y = line[i]
+							x = Math.floor((i - this.start_indent * 2) / 2) * this.dayWidth + (this.changes_mode
+								? i % 2 * this.dayWidth / 2
+								: this.dayWidth / 4 + i % 2 * this.dayWidth / 2)
+							if (rate != last_y) {
+								y = (rate - this.bottom) * this.scale
+								last_y = rate
 								points.push({
 									x: Math.round(x),
 									y: -Math.round(y),
-									rate: line[i]
+									rate: rate
 								});
 								prev = true
 							} else {
