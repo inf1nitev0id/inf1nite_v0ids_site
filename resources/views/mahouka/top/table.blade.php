@@ -41,6 +41,6 @@
 	</table>
 </div>
 @if (Auth::check() && Auth::user()->role === 'admin')
-	<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}">Изменить данные</a>
+	<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}">Внести данные</a>
 @endif
 @endsection
