@@ -8,12 +8,12 @@
 	<table class="container-fluid rating">
 		<tr>
 			<th colspan=2></th>
-			@foreach($sorted_users as $user)
+			@foreach ($rating as $line)
 				<th nowrap>
-					{{ $user['name'] }}
-					@if ($user['alias'] != null)
+					{{ $line['user']['name'] }}
+					@if ($line['user']['alias'] != null)
 						<br />
-						{{ $user['alias'] }}
+						{{ $line['user']['alias'] }}
 					@endif
 				</th>
 			@endforeach
@@ -23,10 +23,10 @@
 				<?php
 					$line1 = "";
 					$line2 = "";
-					foreach ($sorted_users as $user) {
+					foreach ($rating as $line) {
 						$d = $date->format('Y-m-d');
-						$line1 .= "<td>".($rating_table[$user['id']][$d][0] ?? '')."</td>";
-						$line2 .= "<td>".($rating_table[$user['id']][$d][1] ?? '')."</td>";
+						$line1 .= "<td>".($line['rating'][$d][0] ?? '')."</td>";
+						$line2 .= "<td>".($line['rating'][$d][1] ?? '')."</td>";
 					}
 				?>
 				<th rowspan=2>{{ $date->format('Y-m-d') }}</th>
