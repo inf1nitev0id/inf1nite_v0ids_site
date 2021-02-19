@@ -40,4 +40,13 @@ class MahoukaServerRating extends Model
 		$rate = MahoukaServerRating::select('date')->orderBy('date', 'desc')->first()->date;
 		return max($join, $rate);
 	}
+
+// получение даты и времени последнего записанного рейтинга
+	public static function getLastRate() {
+		$query = MahoukaServerRating::select('date', 'time')->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
+		return $query ? [
+			'date' => $query->date,
+			'time' => $query->time,
+		] : null;
+	}
 }

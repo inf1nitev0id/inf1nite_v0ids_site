@@ -114,6 +114,9 @@
 				<i class="fas fa-calendar-day"></i>
 			</div>
 		</div>
+		@if (Auth::check() && Auth::user()->role === 'admin')
+			<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}"><i class="fas fa-edit"></i></a>
+		@endif
 	</div>
 {{-- подробные настройки --}}
 	<ul class="nav nav-tabs">
@@ -184,7 +187,4 @@
 		</div>
 	</div>
 </div>
-@if (Auth::check() && Auth::user()->role === 'admin')
-	<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}">Внести данные</a>
-@endif
 @endsection

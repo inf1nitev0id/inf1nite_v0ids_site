@@ -50,10 +50,11 @@ class MahoukaServerRatingController extends Controller
 
 // форма загрузки
 	public function loadForm() {
-		$query = MahoukaServerRating::select('date', 'time')->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
+		$last_rate = MahoukaServerRating::getLastRate() ?? ['date' => date('Y-m-d'), 'time' => 0];
 		return view('mahouka.top.load', [
-			'last_date' => $query->date,
-			'last_time' => $query->time
+			'last_date' => $last_rate['date'],
+			'last_time' => $last_rate['time'],
+			'top' => $this->top(),
 		]);
 	}
 
@@ -286,14 +287,16 @@ class MahoukaServerRatingController extends Controller
 		$sorted_users = MahoukaServerUser::getSortedUsers();
 		$rating = [];
 		foreach ($sorted_users as $user) {
-			$rating[$user['id']] = MahoukaServerRating::getUserRatingArray($user['id']);
+			$rating[] = [
+				'user' => $user,
+				'rating' => MahoukaServerRating::getUserRatingArray($user['id'])
+			];
 		}
 		return [
-			'sorted_users' => $sorted_users,
 			'min_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMinDate()),
 			'max_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMaxDate()),
 			'step' => new \DateInterval('P1D'),
-			'rating_table' => $rating
+			'rating' => $rating
 		];
 	}
 
@@ -359,19 +362,16 @@ class MahoukaServerRatingController extends Controller
 
 		$lines = [];
 		$i = 0;
-		foreach ($top['rating_table'] as $key => $row){
+		foreach ($top['rating'] as $key => $row){
 			$line = [];
 			$line['index'] = $i++;
-			$line['user']['id'] = $key;
-			$user = MahoukaServerUser::find($key);
-			$line['user']['name'] = $user->name;
-			$line['user']['alias'] = $user->alias;
-			$line['color'] = $this->getColor($key - 1);
+			$line['user'] = $row['user'];
+			$line['color'] = $this->getColor($line['user']['id'] - 1);
 			$line['rating'] = [];
 			$prev = null;
 			foreach ($dates as $date) {
-				$prev = ($line['rating'][] = $row[$date][0] ?? $prev);
-				$prev = ($line['rating'][] = $row[$date][1] ?? $prev);
+				$prev = ($line['rating'][] = $row['rating'][$date][0] ?? $prev);
+				$prev = ($line['rating'][] = $row['rating'][$date][1] ?? $prev);
 			}
 			$line['visible'] = true;
 
