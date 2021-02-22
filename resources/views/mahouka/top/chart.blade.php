@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/css/chart.css" />
 <script>
 	var min_date = new Date('{{ $min_date }}')
-	var max_date = new Date('{{ $max_date }}')
+	var days = {{ $days }}
 	var lines = @json($lines)
 
 	var events = @json($events)
@@ -115,7 +115,7 @@
 			</div>
 		</div>
 		@if (Auth::check() && Auth::user()->role === 'admin')
-			<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}"><i class="fas fa-edit"></i></a>
+			<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.edit') }}"><i class="fas fa-edit"></i></a>
 		@endif
 	</div>
 {{-- подробные настройки --}}
