@@ -8,39 +8,47 @@
 	<table class="container-fluid rating">
 		<tr>
 			<th colspan=2></th>
-			@foreach ($rating as $line)
+			@foreach ($users as $user)
 				<th nowrap>
-					{{ $line['user']['name'] }}
-					@if ($line['user']['alias'] != null)
+					{{ $user['name'] }}
+					@if ($user['alias'] != null)
 						<br />
-						{{ $line['user']['alias'] }}
+						{{ $user['alias'] }}
 					@endif
 				</th>
 			@endforeach
 		</tr>
-		@for ($date = clone($min_date); $date <= $max_date; $date->add($step))
+		@for ($day = 0, $date = clone($min_date), $days = count($rating); $day < $days; $day++, $date->add($step))
 			<tr>
 				<?php
 					$line1 = "";
 					$line2 = "";
-					foreach ($rating as $line) {
+					foreach ($rating[$day] as $line) {
 						$d = $date->format('Y-m-d');
-						$line1 .= "<td>".($line['rating'][$d][0] ?? '')."</td>";
-						$line2 .= "<td>".($line['rating'][$d][1] ?? '')."</td>";
+						$line1 .= "<td>".($line[0] ?? '')."</td>";
+						$line2 .= "<td>".($line[1] ?? '')."</td>";
 					}
 				?>
 				<th rowspan=2>{{ $date->format('Y-m-d') }}</th>
 				<th>Утро</th>
-				<?php echo $line1; ?>
+			@foreach ($rating[$day][0] as $rate)
+				<td>
+					{{ $rate }}
+				</td>
+			@endforeach
 			</tr>
 			<tr>
 				<th>Вечер</th>
-				<?php echo $line2; ?>
+			@foreach ($rating[$day][1] as $rate)
+				<td>
+					{{ $rate }}
+				</td>
+			@endforeach
 			</tr>
 		@endfor
 	</table>
 </div>
 @if (Auth::check() && Auth::user()->role === 'admin')
-	<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.load') }}">Внести данные</a>
+	<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.edit') }}">Внести данные</a>
 @endif
 @endsection

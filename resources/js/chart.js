@@ -7,7 +7,7 @@ window.onload = function () {
 			default_day_width: 20,
 			lines: lines,
 			min_date: min_date,
-			max_date: max_date,
+			days_full: days,
 			start_indent: 0,
 			end_indent: 0,
 			events_list: events,
@@ -69,10 +69,6 @@ window.onload = function () {
 			}
 		},
 		computed: {
-// количество дней
-			days_full: function() {
-				return Math.round((this.max_date - this.min_date) / 24 / 60 / 60 / 1000) + 1
-			},
 // график изменений
 			changes: function() {
 				var c = []

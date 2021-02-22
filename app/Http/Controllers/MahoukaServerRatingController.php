@@ -56,7 +56,6 @@ class MahoukaServerRatingController extends Controller
 			'last_time' => $last_rate['time'],
 			'top' => $this->top(),
 		]);
-	}
 
 // обработка и проверка правильности данных перез загрузкой
 	public function preload(Request $request) {
@@ -285,24 +284,33 @@ class MahoukaServerRatingController extends Controller
 // получение данных о рейтинге из БД
 	private function top() {
 		$sorted_users = MahoukaServerUser::getSortedUsers();
-		$rating = [];
-		foreach ($sorted_users as $user) {
-			$rating[] = [
-				'user' => $user,
-				'rating' => MahoukaServerRating::getUserRatingArray($user['id'])
-			];
+		$min_date = \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMinDate());
+		$max_date = \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMaxDate());
+		$step = new \DateInterval('P1D');
+		$ratings = [];
+		$table = [];
+		foreach ($sorted_users as $key => $user) {
+			$ratings[$key] = MahoukaServerRating::getUserRatingArray($user['id']);
+		}
+		for ($date = clone($min_date), $i = 0; $date <= $max_date; $date->add($step), $i++) {
+			foreach ($sorted_users as $key => $user) {
+				$d = $date->format('Y-m-d');
+				$table[$i][0][$key] = $ratings[$key][$d][0] ?? null;
+				$table[$i][1][$key] = $ratings[$key][$d][1] ?? null;
+			}
 		}
 		return [
-			'min_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMinDate()),
-			'max_date' => \DateTime::createFromFormat('Y-m-d', MahoukaServerRating::getMaxDate()),
-			'step' => new \DateInterval('P1D'),
-			'rating' => $rating
+			'min_date' => $min_date->format('Y-m-d'),
+			'users' => $sorted_users,
+			'rating' => $table
 		];
 	}
 
 // вывод рейтинга в виде таблицы
 	public function table() {
-		return view('mahouka.top.table', $this->top());
+		$top = $this->top();
+		$top['step'] = new \DateInterval('P1D');
+		return view('mahouka.top.table', $top);
 	}
 
 // создание уникальных цветов для каждого графика
@@ -354,24 +362,19 @@ class MahoukaServerRatingController extends Controller
 // подготовка данных для отрисовки графика
 	public function chart() {
 		$top = $this->top();
-
-		$dates = [];
-		for ($date = clone($top['min_date']); $date <= $top['max_date']; $date->add($top['step'])) {
-			$dates[] = $date->format('Y-m-d');
-		}
-
 		$lines = [];
+		$days = count($top['rating']);
 		$i = 0;
-		foreach ($top['rating'] as $key => $row){
+		foreach ($top['users'] as $key => $user){
 			$line = [];
 			$line['index'] = $i++;
-			$line['user'] = $row['user'];
+			$line['user'] = $user;
 			$line['color'] = $this->getColor($line['user']['id'] - 1);
 			$line['rating'] = [];
 			$prev = null;
-			foreach ($dates as $date) {
-				$prev = ($line['rating'][] = $row['rating'][$date][0] ?? $prev);
-				$prev = ($line['rating'][] = $row['rating'][$date][1] ?? $prev);
+			for ($day = 0; $day < $days; $day++) {
+				$prev = ($line['rating'][] = $top['rating'][$day][0][$key] ?? $prev);
+				$prev = ($line['rating'][] = $top['rating'][$day][1][$key] ?? $prev);
 			}
 			$line['visible'] = true;
 
@@ -408,8 +411,8 @@ class MahoukaServerRatingController extends Controller
 		}
 
 		return view('mahouka.top.chart', [
-			'min_date' => $top['min_date']->format('Y-m-d'),
-			'max_date' => $top['max_date']->format('Y-m-d'),
+			'min_date' => $top['min_date'],
+			'days' => count($top['rating']),
 			'lines' => $lines,
 			'events' => $events,
 			'series' => $series

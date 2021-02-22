@@ -5,6 +5,7 @@
     "/css/forum.css": "/css/forum.css",
     "/css/app.css": "/css/app.css",
     "/js/chart.js": "/js/chart.js",
+    "/js/edit_rate.js": "/js/edit_rate.js",
     "/js/reg.js": "/js/reg.js",
     "/js/vue.js": "/js/vue.js"
 }
