@@ -38,8 +38,8 @@ Route::get('/logout', function() {
 	return redirect()->route('home');
 })->name('logout')->middleware('auth');
 
+Route::get('/forum/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name('forum');
 Route::prefix('forum')->name('forum.')->group(function() {
-	Route::get('/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name('forum');
 	Route::post('/add-comment', [ForumController::class, 'addComment'])->name('add-comment');
 	Route::post('/delete-comment', [ForumController::class, 'deleteComment'])->name('delete-comment');
 	Route::get('/{id}/add-post', [ForumController::class, 'addPostForm'])->name('add-post-form');
