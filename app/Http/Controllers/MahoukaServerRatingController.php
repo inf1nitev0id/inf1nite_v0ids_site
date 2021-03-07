@@ -9,6 +9,7 @@ use App\Models\MahoukaServerRating;
 use App\Models\MahoukaServerNumber;
 use App\Models\MahoukaServerEvent;
 use App\Models\MahoukaSeries;
+use App\Models\ApiKeys;
 
 class MahoukaServerRatingController extends Controller
 {
@@ -47,7 +48,7 @@ class MahoukaServerRatingController extends Controller
 		$result = $this->getJsonFormApi(
 			'https://api.tatsu.gg/v1/guilds/763030341103255582/rankings/all',
 			[
-				'header' => "Authorization: S5WSj0Gnps-DNj3mjp57ePGdGFSmO2Eb9",
+				'header' => "Authorization: ".ApiKeys::getKeyString('tatsu'),
 				'method' => 'GET',
 			]
 		);
@@ -63,7 +64,7 @@ class MahoukaServerRatingController extends Controller
 		$result = $this->getJsonFormApi(
 			'https://discord.com/api/v8/users/'.$id,
 			[
-				'header' => "Authorization: Bot NjE5NjYyNDExNzAzNzc5MzQ5.XXLflw.R5nTMG5I036J2yA5Ms2GIfyPF58",
+				'header' => "Authorization: Bot ".ApiKeys::getKeyString('bot'),
 				'method' => 'GET',
 			]
 		);
