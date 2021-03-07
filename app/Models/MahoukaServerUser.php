@@ -24,6 +24,7 @@ class MahoukaServerUser extends Model
 			$user = [];
 			$user['id'] = $q_user->id;
 			$user['name'] = $q_user->name;
+			$user['discord_id'] = $q_user->discord_id;
 			$user['alias'] = $q_user->alias;
 			$user['join_date'] = $q_user->join_date;
 			$where = [['user_id', '=', $user['id']]];
@@ -41,5 +42,9 @@ class MahoukaServerUser extends Model
 			return $a['rate'] < $b['rate'];
 		});
 		return $users;
+	}
+
+	public static function setDiscordId($id, $discord_id) {
+		MahoukaServerUser::where('id', $id)->update(['discord_id' => $discord_id]);
 	}
 }

@@ -38,11 +38,10 @@ Route::get('/logout', function() {
 	return redirect()->route('home');
 })->name('logout')->middleware('auth');
 
-Route::get('/forum/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name('forum');
 Route::prefix('forum')->name('forum.')->group(function() {
+	Route::get('/{id?}', [ForumController::class, 'forum'])->where('id', '[0-9]+')->name('forum');
 	Route::post('/add-comment', [ForumController::class, 'addComment'])->name('add-comment');
 	Route::post('/delete-comment', [ForumController::class, 'deleteComment'])->name('delete-comment');
-
 	Route::get('/{id}/add-post', [ForumController::class, 'addPostForm'])->name('add-post-form');
 	Route::post('/add-post', [ForumController::class, 'addPost'])->name('add-post');
 	Route::post('/delete-post', [ForumController::class, 'deletePost'])->name('delete-post');
@@ -57,10 +56,13 @@ Route::prefix('mahouka')->name('mahouka.')->group(function() {
 		Route::get('/', [MahoukaServerRatingController::class, 'chart'])->name('chart');
 		Route::get('/table', [MahoukaServerRatingController::class, 'table'])->name('table');
 
+		Route::get('/tatsu_top', [MahoukaServerRatingController::class, 'getRatingFromApi'])->name('tatsu_top');
 		Route::middleware('role:admin')->group(function() {
 			Route::get('/edit', [MahoukaServerRatingController::class, 'edit'])->name('edit');
+			Route::get('/discord_user/{id?}', [MahoukaServerRatingController::class, 'getUserDataFromApi'])
+				->where('id', '[0-9]+')->name('discord_user');
 			Route::post('/scan', [MahoukaServerRatingController::class, 'scan'])->name('scan');
-			Route::post('/load_hashes', [MahoukaServerRatingController::class, 'load_hashes'])->name('load-hashes');
+			Route::post('/load', [MahoukaServerRatingController::class, 'load'])->name('load');
 			Route::post('/write_rate', [MahoukaServerRatingController::class, 'write_rate'])->name('write-rate');
 		});
 	});

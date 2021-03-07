@@ -1,0 +1,49 @@
+table input {
+  width: 80px;
+}
+
+table .header {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 100;
+}
+
+table .btn {
+  width: 100%;
+}
+
+.user-btn {
+  text-align: left;
+  overflow-x: hidden;
+  width: 100px !important;
+}
+
+form {
+  max-width: none;
+}
+
+form:not(:first-child) {
+  margin-top: 30px;
+}
+
+img {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.btn-group {
+  display: flex;
+}
+
+#json-textarea {
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.form-check-input {
+  position: relative;
+  margin-left: 0;
+}
+

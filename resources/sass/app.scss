@@ -45,22 +45,29 @@ table {
 		padding-left: 5px;
 		padding-right: 5px;
 	}
+	&.rating {
+		td, th {
+			&:not(:last-child) {
+				border-right: 1px solid rgba(0, 0, 0, 0.2);
+			}
+		}
+		tr:not(:first-child) {
+			&:nth-child(odd) {
+				border-top: 1px solid rgba(0, 0, 0, 0.1);
+			}
+			&:nth-child(even) {
+				border-top: 1px solid rgba(0, 0, 0, 0.2);
+			}
+		}
+	}
 }
 
-table.rating {
-	td, th {
-		&:not(:last-child) {
-			border-right: 1px solid rgba(0, 0, 0, 0.2);
-		}
-	}
-	tr:not(:first-child) {
-		&:nth-child(odd) {
-			border-top: 1px solid rgba(0, 0, 0, 0.1);
-		}
-		&:nth-child(even) {
-			border-top: 1px solid rgba(0, 0, 0, 0.2);
-		}
-	}
+.mini-btn {
+	flex: 0 !important;
+}
+
+.icon-btn {
+	width: 42px !important;
 }
 
 .overflow {

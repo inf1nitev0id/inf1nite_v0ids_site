@@ -56,6 +56,14 @@ table.rating tr:not(:first-child):nth-child(even) {
   border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
 
+.mini-btn {
+  flex: 0 !important;
+}
+
+.icon-btn {
+  width: 42px !important;
+}
+
 .overflow {
   overflow-x: auto;
 }
