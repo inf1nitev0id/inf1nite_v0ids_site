@@ -16,6 +16,7 @@ class CreateMahoukaServerUsersTable extends Migration
 		Schema::create('mahouka_server_users', function (Blueprint $table) {
 			$table->id();
 			$table->string('name', 255);
+			$table->bigInteger('discord_user', 18)->nullable()->default(null);
 			$table->string('alias', 255)->nullable();
 			$table->boolean('hidden')->default(false);
 			$table->date('join_date')->nallable();

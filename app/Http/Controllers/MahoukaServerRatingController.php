@@ -12,65 +12,86 @@ use App\Models\MahoukaSeries;
 
 class MahoukaServerRatingController extends Controller
 {
-// преобразует массив в бинарную строку
-	private static function arrayToString(array $array, int $char_height) {
-		$bytes = ceil($char_height / 8);
-		$result = "";
-		foreach($array as $line) {
-			$chars = array_fill(0, $bytes, 0);
-			foreach($line as $i => $bit) {
-				$chars[floor($i / 8)] << 1;
-				$chars[floor($i / 8)] += $bit;
-			}
-			foreach($chars as $char) {
-				$result .= chr($char);
-			}
+// страница редактирования рейтинга
+	public function edit() {
+		$top = $this->top();
+		$top['last_date'] = MahoukaServerRating::getMaxDate() ?? date('Y-m-d');
+		foreach ($top['users'] as &$user) {
+			$user['hashes'] = [];
+			$user['changed_id'] = false;
+			$user['new_rate'] = [
+				'morning' => null,
+				'evening' => null,
+			];
+		}
+		return view('mahouka.top.edit', $top);
+	}
+
+	private function getJsonFormApi($url, $headers) {
+		$options = [ 'http' => $headers ];
+		$context = stream_context_create($options);
+		try {
+			$result = file_get_contents($url, false, $context);
+		} catch (\ErrorException $error) {
+			echo $error->getMessage();
+			return false;
+		}
+		if (!$result) {
+			echo "error";
+			return false;
 		}
 		return $result;
 	}
 
-// преобразует бинарную строку в массив
-	private static function stringToArray(string $string, int $char_height) {
-		$bytes = ceil($char_height / 8);
-		$length = strlen($string);
-		$result = [];
-		for($i = 0; $i < $length / $bytes; $i++) {
-			$line = substr($string, $i * $bytes, $bytes);
-			for($j = 0; $j < $bytes; $j++) {
-				$char = ord($line[$j]);
-				for($k = 0; $k < 8; $k++) {
-					if($j * 8 + $k >= $char_height) break;
-					$result[$i][$k] = $char & 1;
-					$char >> 1;
-				}
-			}
+	public function getRatingFromApi() {
+		$result = $this->getJsonFormApi(
+			'https://api.tatsu.gg/v1/guilds/763030341103255582/rankings/all',
+			[
+				'header' => "Authorization: S5WSj0Gnps-DNj3mjp57ePGdGFSmO2Eb9",
+				'method' => 'GET',
+			]
+		);
+		if ($result) {
+			header('Content-Type: application/json');
+			return response()->json(json_decode($result));
+		} else {
+			return null;
 		}
-		return $result;
 	}
 
-// форма загрузки
-	public function loadForm() {
-		$last_rate = MahoukaServerRating::getLastRate() ?? ['date' => date('Y-m-d'), 'time' => 0];
-		return view('mahouka.top.load', [
-			'last_date' => $last_rate['date'],
-			'last_time' => $last_rate['time'],
-			'top' => $this->top(),
-		]);
+	public function getUserDataFromApi($id) {
+		$result = $this->getJsonFormApi(
+			'https://discord.com/api/v8/users/'.$id,
+			[
+				'header' => "Authorization: Bot NjE5NjYyNDExNzAzNzc5MzQ5.XXLflw.R5nTMG5I036J2yA5Ms2GIfyPF58",
+				'method' => 'GET',
+			]
+		);
+		if ($result) {
+			header('Content-Type: application/json');
+			return response()->json(json_decode($result));
+		} else {
+			return null;
+		}
+	}
 
 // обработка и проверка правильности данных перез загрузкой
-	public function preload(Request $request) {
+	public function scan(Request $request) {
 		$request->validate([
 			'url' => 'url|required',
-			'date' => 'date|required',
-			'time' => 'boolean|required'
 		]);
+		header('Content-Type: application/json');
 		if(!$image = imageCreateFromPNG($request->url))
-			return redirect()->back()->withErrors(["Ссылка должна указывать на PNG изображение."]);
+			return response()->json([
+				'error' => "Ссылка должна указывать на PNG изображение.",
+			]);
 		$SIZE_X = 720;
 		$SIZE_Y = 730;
 
 		if(imageSX($image) != $SIZE_X || imageSY($image) != $SIZE_Y)
-			return redirect()->back()->withErrors(["Изображение должно иметь разрешение ".$SIZE_X."*".$SIZE_Y."."]);
+			return response()->json([
+				'error' => "Изображение должно иметь разрешение $SIZE_X*$SIZE_Y.",
+			]);
 
 		$CHAR_HEIGHT = 29;
 		$ROW_HEIGHT = 74;
@@ -183,14 +204,6 @@ class MahoukaServerRatingController extends Controller
 				->where('hash', '=', $hash)
 				->first();
 			$user = null;
-			if ($query) {
-				$user_db = MahoukaServerUser::find($query->user_id);
-				$user['id'] = $user_db->id;
-				$user['name'] = $user_db->name;
-			} else {
-				$unknown = true;
-				$unknown_names[$hash] = $row['name'];
-			}
 			$rate = 0;
 			foreach($row['rate'] as $char) {
 				$rate *= 10;
@@ -199,38 +212,75 @@ class MahoukaServerRatingController extends Controller
 					$rate += $numbers_code[$num_hash];
 				} else {
 					$unknown = true;
-					if (1) {
-						$unknown_numbers[$num_hash] = $char;
-					}
+					$unknown_numbers[$num_hash] = $char;
 				}
 			}
-			$user['rate'] = $rate;
+			if ($query) {
+				$user_db = MahoukaServerUser::find($query->user_id);
+				$user['id'] = $user_db->id;
+				$user['name'] = $user_db->name;
+				$user['rate'] = $rate;
+			} else {
+				$unknown = true;
+				$unknown_names[] = [
+					"hash" => $hash,
+					"picture" => $row['name'],
+					"rate" => $rate,
+				];
+			}
 			if (!$unknown)
 				$users[] = $user;
 		}
 
-		$usernames = [];
-		$query = MahoukaServerUser::all();
-		foreach ($query as $row) {
-			$username['id'] = $row->id;
-			$username['name'] = $row->name;
-			$usernames[] = $username;
-		}
-
 		imageDestroy($image);
 
-		return view('mahouka.top.preload', [
-			'url' => $request->url,
-			'date' => $request->date,
-			'time' => $request->time,
+		return response()->json([
 			'users' => $users,
 			'unknown_names' => $unknown_names,
 			'unknown_numbers' => $unknown_numbers,
 			'char_height' => $CHAR_HEIGHT,
-			'usernames' => $usernames
 		]);
 	}
 
+	public function load(Request $request) {
+		$users = $request->users;
+		$date = substr($request->date, 0, 10);
+
+		$insert_query = [];
+		foreach ($users as $user) {
+			if ($user['changed_id']) {
+				MahoukaServerUser::setDiscordId($user['id'], $user['discord_id']);
+			}
+
+			if ($user['new_rate']['morning'] !== null) {
+				$insert_query[] = [
+					'user_id' => $user['id'],
+					'rate' => $user['new_rate']['morning'],
+					'date' => $date,
+					'time' => 0,
+				];
+			}
+			if ($user['new_rate']['evening'] !== null) {
+				$insert_query[] = [
+					'user_id' => $user['id'],
+					'rate' => $user['new_rate']['evening'],
+					'date' => $date,
+					'time' => 1,
+				];
+			}
+
+			foreach ($user['hashes'] as $hash) {
+				if (!MahoukaServerHash::select('user_id')->where('hash', '=', $hash)->first()) {
+					$db_hash = new MahoukaServerHash;
+					$db_hash->hash = $hash;
+					$db_hash->user_id = $user['id'];
+					$db_hash->save();
+				}
+			}
+		}
+
+		MahoukaServerRating::upsert($insert_query, ['user_id', 'date', 'time'], ['rate']);
+	}
 // загрузка хешей для новых ников и цифр в БД
 	public function load_hashes(Request $request) {
 		$array = $request->all();
@@ -300,7 +350,7 @@ class MahoukaServerRatingController extends Controller
 			}
 		}
 		return [
-			'min_date' => $min_date->format('Y-m-d'),
+			'min_date' => $min_date,
 			'users' => $sorted_users,
 			'rating' => $table
 		];
@@ -411,7 +461,7 @@ class MahoukaServerRatingController extends Controller
 		}
 
 		return view('mahouka.top.chart', [
-			'min_date' => $top['min_date'],
+			'min_date' => $top['min_date']->format('Y-m-d'),
 			'days' => count($top['rating']),
 			'lines' => $lines,
 			'events' => $events,

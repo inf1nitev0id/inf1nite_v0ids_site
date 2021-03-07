@@ -96,27 +96,30 @@
 {{-- общие кнопки управления графиком --}}
 	<div v-cloak class="form-inline">
 		<div class="btn-group m-1">
-			<div class="btn btn-outline-secondary" title="Показать всё" @click="showAll()">
+			<div class="btn btn-outline-secondary icon-btn" title="Показать всё" @click="showAll()">
 				<i class="far fa-eye"></i>
 			</div>
-			<div class="btn btn-outline-secondary" title="Инвертировать" @click="invert()">
+			<div class="btn btn-outline-secondary icon-btn" title="Инвертировать" @click="invert()">
 				<i class="fas fa-exclamation"></i>
 			</div>
-			<div class="btn btn-outline-secondary" title="Скрыть всё" @click="hideAll()">
+			<div class="btn btn-outline-secondary icon-btn" title="Скрыть всё" @click="hideAll()">
 				<i class="far fa-eye-slash"></i>
 			</div>
 		</div>
 		<div class="btn-group m-1">
-			<div class="btn btn-outline-secondary" :class="{active: changes_mode}" title="Режим изменений" @click="changes_mode = !changes_mode">
+			<div class="btn btn-outline-secondary icon-btn" :class="{active: changes_mode}" title="Режим изменений" @click="changes_mode = !changes_mode">
 				<i class="fas fa-chart-line"></i>
 			</div>
-			<div v-if="changes_mode" class="btn btn-outline-secondary" :class="{active: day_mode}" title="Суммировать значения за день" @click="day_mode = !day_mode">
+			<div v-if="changes_mode" class="btn btn-outline-secondary icon-btn" :class="{active: day_mode}" title="Суммировать значения за день" @click="day_mode = !day_mode">
 				<i class="fas fa-calendar-day"></i>
 			</div>
 		</div>
-		@if (Auth::check() && Auth::user()->role === 'admin')
-			<a class="btn btn-outline-secondary" href="{{ route('mahouka.top.edit') }}"><i class="fas fa-edit"></i></a>
-		@endif
+		<div class="btn-group m-1">
+			@if (Auth::check() && Auth::user()->role === 'admin')
+				<a class="btn btn-outline-secondary icon-btn" href="{{ route('mahouka.top.edit') }}"><i class="fas fa-edit"></i></a>
+			@endif
+			<a class="btn btn-outline-secondary mini-btn" href="{{ route('mahouka.top.tatsu_top') }}">Tatsu</a>
+		</div>
 	</div>
 {{-- подробные настройки --}}
 	<ul class="nav nav-tabs">
