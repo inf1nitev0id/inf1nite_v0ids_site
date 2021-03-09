@@ -36,31 +36,50 @@ class sendWebhook extends Command {
 	*/
 	public function handle() {
 		$users = MahoukaServerUser::getSortedUsers();
-		$top = "";
-		foreach ($users as $key => $user) {
-			if ($user['rate'])
-				$top .= ($key + 1)." <@".$user['discord_id']."> - ".$user['rate']."\n";
-		}
-		$url = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('mahouka-bot-channel-webhook');
 		$hookObject = [
-			"username" => "Хлебозаменитель",
-			"tts" => false,
-			"embeds" => [
+			'username' => "Хлебозаменитель",
+			'tts' => false,
+			'embeds' => [
 				[
-					"title" => "Рейтинг ".date('d.m.Y H:i'),
-					"type" => "rich",
-					"description" => $top,
-					"color" => hexdec( "FFFFFF" ),
+					'title' => "**Рейтинг ".date('d.m.Y H:i')."**",
+					'type' => "rich",
+					'color' => hexdec( "FFFFFF" ),
 				]
 			]
 		];
-		$postdata = json_encode($hookObject);
-
+		$string = "";
+		$title = "";
+		$count = 1;
+		foreach ($users as $key => $user) {
+			if ($user['rate']) {
+				$row = ($key + 1).".	`".$user['name']."` <@".$user['discord_id']."> - **".$user['rate']."**\n";
+				if (strlen($string) + strlen($row) >= 2048) {
+					if ($count == 1) $title = "Часть $count";
+					$hookObject['embeds'][] = [
+						'title' => $title,
+						'description' => $string,
+						'type' => "rich",
+						'color' => hexdec( "FFFFFF" ),
+					];
+					$title = "Часть ".++$count;
+					$string = "";
+				}
+				$string .= $row;
+			}
+		}
+		$hookObject['embeds'][] = [
+			'title' => $title,
+			'description' => $string,
+			'type' => "rich",
+			'color' => hexdec( "FFFFFF" ),
+		];
+		// $url = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('test-server-webhook');
+		$url = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('mahouka-bot-channel-webhook');
 		$opts = [
 			'http' => [
 				'method'  => 'POST',
 				'header'  => 'Content-Type: application/json',
-				'content' => $postdata
+				'content' => json_encode($hookObject)
 			]
 		];
 		$context = stream_context_create($opts);
