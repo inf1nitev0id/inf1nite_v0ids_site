@@ -3,6 +3,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\MahoukaServerUser;
+use App\Models\MahoukaServerRating;
 use App\Models\ApiKeys;
 
 class sendWebhook extends Command {
@@ -41,16 +42,11 @@ class sendWebhook extends Command {
 	*/
 	public function handle() {
 		$users = MahoukaServerUser::getSortedUsers();
+		$lastRate = MahoukaServerRating::getLastRate();
 		$hookObject = [
 			'username' => "Хлебозаменитель",
+			'content' => ($lastRate['time'] ? "Вечерний" : "Утренний")." рейтинг ".$lastRate['date'],
 			'tts' => false,
-			'embeds' => [
-				[
-					'title' => "**Рейтинг ".date('d.m.Y H:i')."**",
-					'type' => "rich",
-					'color' => hexdec( "FFFFFF" ),
-				]
-			]
 		];
 		$string = "";
 		$title = "";
