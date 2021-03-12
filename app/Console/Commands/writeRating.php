@@ -36,6 +36,7 @@ class writeRating extends Command {
 	* @return int
 	*/
 	public function handle() {
+		$start = microtime(true);
 		$time = intval($this->argument('time'));
 		if (!($time == 0 || $time == 1)) {
 			$this->info("Аргумент time должены быть равен 0 или 1.");
@@ -70,14 +71,29 @@ class writeRating extends Command {
 		$upsert_data = [];
 		foreach ($data as $user) {
 			$url = "https://discord.com/api/v8/users/$user->user_id";
-			$db_user = MahoukaServerUser::select('id', 'name')->where('discord_id', '=', $user->user_id)->first();
-			if (!$db_user) {
+			$counter = 0;
+			while (true) {
 				try {
 					$user_data = json_decode(file_get_contents($url, false, $context));
+					break;
 				} catch (\ErrorException $error) {
-					$this->info($error->getMessage());
-					return 0;
+					preg_match("/ [0-9]{3} /" ,$error->getMessage(), $matches);
+					if (intval($matches[0]) == 429 && $counter < 3) {
+						$counter++;
+						sleep(30);
+					} else {
+						$this->info("\n".$error->getMessage());
+						return 0;
+					}
 				}
+			}
+			$db_user = MahoukaServerUser::select('id', 'name')->where('discord_id', '=', $user->user_id)->first();
+			if ($db_user) {
+				if ($db_user->name != $user_data->username) {
+					$db_user->name = $user_data->username;
+					$db_user->save();
+				}
+			} else {
 				$db_user = new MahoukaServerUser;
 				$db_user->name = $user_data->username;
 				$db_user->discord_id = $user->user_id;
@@ -94,7 +110,8 @@ class writeRating extends Command {
 		}
 		MahoukaServerRating::upsert($upsert_data, ['user_id', 'date', 'time'], ['rate']);
 		$bar->finish();
-		$this->info("Rating for $date $time writed!");
+		$finish = round((microtime(true) - $start) * 10) / 10;
+		$this->info("\nRating for $date $time writed in $finish seconds!");
 		return 0;
 	}
 }
