@@ -29,6 +29,11 @@ class sendWebhook extends Command {
 		parent::__construct();
 	}
 
+	private $chars = [
+		'original' => ['*', '~', '_', '`'],
+		'replace' => ['\\*', '\\~', '\\_', '\\`'],
+	];
+
 	/**
 	* Execute the console command.
 	*
@@ -52,7 +57,8 @@ class sendWebhook extends Command {
 		$count = 1;
 		foreach ($users as $key => $user) {
 			if ($user['rate']) {
-				$row = ($key + 1).".	`".$user['name']."` <@".$user['discord_id']."> - **".$user['rate']."**\n";
+				$username = str_replace($this->chars['original'], $this->chars['replace'], $user['name']);
+				$row = ($key + 1).".	**".$username."** - ".$user['rate']."\n";
 				if (strlen($string) + strlen($row) >= 2048) {
 					if ($count == 1) $title = "Часть $count";
 					$hookObject['embeds'][] = [
