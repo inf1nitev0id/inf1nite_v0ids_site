@@ -97,7 +97,7 @@ class writeRating extends Command {
 				$db_user = new MahoukaServerUser;
 				$db_user->name = $user_data->username;
 				$db_user->discord_id = $user->user_id;
-				$db_user->join_date = $date;
+				$db_user->join_date = $time ? $date : date('Y-m-d', strtotime('yesterday'));;
 				$db_user->save();
 			}
 			$upsert_data[] = [
