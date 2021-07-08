@@ -78,7 +78,7 @@ class writeRating extends Command {
 					break;
 				} catch (\ErrorException $error) {
 					preg_match("/ [0-9]{3} /" ,$error->getMessage(), $matches);
-					if (intval($matches[0]) == 429 && $counter < 3) {
+					if (intval($matches[0] ?? 429) == 429 && $counter < 3) {
 						$counter++;
 						sleep(30);
 					} else {
