@@ -12,7 +12,7 @@ class MahoukaServerUser extends Model
 	public $timestamps = false;
 
 // получение массива пользователей, отсортированных по последнему рейтингу
-	public static function getSortedUsers($date = null, $with_hidden = false) {
+	public static function getSortedUsers($date = null, $with_hidden = false, $only_last = false) {
 		$query_users = null;
 		if ($with_hidden) {
 			$query_users = MahoukaServerUser::all();
@@ -20,6 +20,7 @@ class MahoukaServerUser extends Model
 			$query_users = MahoukaServerUser::where('hidden', '=', 'false')->get();
 		}
 		$users = [];
+		$last_date = null;
 		foreach($query_users as $q_user) {
 			$user = [];
 			$user['id'] = $q_user->id;
@@ -30,9 +31,14 @@ class MahoukaServerUser extends Model
 			$where = [['user_id', '=', $user['id']]];
 			if ($date != null)
 				$where[] = ['date', '=', $date];
-			$query_rate = MahoukaServerRating::select('rate')->where($where)->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
-			if($query_rate) {
+			$query_rate = MahoukaServerRating::select('rate', 'date')->where($where)->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
+			if ($query_rate) {
 				$user['rate'] = $query_rate->rate;
+				$time = strtotime($query_rate->date);
+				$user['last_date'] = $time;
+				if ($time > $last_date ?? 0) {
+					$last_date = $time;
+				}
 			} else {
 				$user['rate'] = 0;
 			}
@@ -41,6 +47,11 @@ class MahoukaServerUser extends Model
 		usort($users, function($a, $b) {
 			return $a['rate'] < $b['rate'];
 		});
+		if ($only_last) {
+			$users = array_filter($users, function($item) use ($last_date) {
+				return $item['last_date'] == $last_date;
+			});
+		}
 		return $users;
 	}
 

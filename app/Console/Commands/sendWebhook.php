@@ -41,7 +41,7 @@ class sendWebhook extends Command {
 	* @return int
 	*/
 	public function handle() {
-		$users = MahoukaServerUser::getSortedUsers();
+		$users = MahoukaServerUser::getSortedUsers(null, false, true);
 		$lastRate = MahoukaServerRating::getLastRate();
 		$hookObject = [
 			'username' => "Хлебозаменитель",
