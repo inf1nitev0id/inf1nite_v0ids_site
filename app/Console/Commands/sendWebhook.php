@@ -51,10 +51,11 @@ class sendWebhook extends Command {
 		$string = "";
 		$title = "";
 		$count = 1;
-		foreach ($users as $key => $user) {
+		$i = 1;
+		foreach ($users as $user) {
 			if ($user['rate']) {
 				$username = str_replace($this->chars['original'], $this->chars['replace'], $user['name']);
-				$row = ($key + 1).".	**".$username."** - ".$user['rate']."\n";
+				$row = $i++.".	**".$username."** - ".$user['rate']."\n";
 				if (strlen($string) + strlen($row) >= 2048) {
 					if ($count == 1) $title = "Часть $count";
 					$hookObject['embeds'][] = [
