@@ -1,7 +1,10 @@
 #!/usr/bin/env php
 <?php
 
-define('LARAVEL_START', microtime(true));
+define(
+    'LARAVEL_START',
+    microtime(true)
+);
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +51,9 @@ $status = $kernel->handle(
 |
 */
 
-$kernel->terminate($input, $status);
+$kernel->terminate(
+    $input,
+    $status
+);
 
 exit($status);

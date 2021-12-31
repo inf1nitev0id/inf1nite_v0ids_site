@@ -4,30 +4,30 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInvitesTable extends Migration
-{
-	/**
-	 * Run the migrations.
-	 *
-	 * @return void
-	 */
-	public function up()
-	{
-		Schema::create('invites', function (Blueprint $table) {
-			$table->id();
-			$table->string('code', 10)->unique();
-			$table->integer('usages')->nullable();
-			$table->text('description');
-		});
-	}
+class CreateInvitesTable extends Migration {
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up() {
+        Schema::create(
+            'invites',
+            function(Blueprint $table) {
+                $table->id();
+                $table->string('code', 10)->unique();
+                $table->integer('usages')->nullable();
+                $table->text('description');
+            }
+        );
+    }
 
-	/**
-	 * Reverse the migrations.
-	 *
-	 * @return void
-	 */
-	public function down()
-	{
-		Schema::dropIfExists('invites');
-	}
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down() {
+        Schema::dropIfExists('invites');
+    }
 }

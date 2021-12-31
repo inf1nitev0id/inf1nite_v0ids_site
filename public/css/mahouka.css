@@ -1,12 +1,12 @@
 .navbar-dark {
-  background-color: #00A387 !important;
+    background-color: #00A387 !important;
 }
 
 .navbar-dark .nav-link {
-  color: #EEEEEE !important;
+    color: #EEEEEE !important;
 }
 
 .navbar-dark .nav-link:hover {
-  color: #FFFFFF !important;
+    color: #FFFFFF !important;
 }
 

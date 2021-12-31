@@ -1,46 +1,49 @@
 table {
-	input {
-		width: 80px;
-	}
-	.header {
-		position: sticky;
-		top: 0;
-		background-color: white;
-		z-index: 100;
-	}
-	.btn {
-		width: 100%;
-	}
+    input {
+        width: 80px;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 100;
+    }
+
+    .btn {
+        width: 100%;
+    }
 }
 
 .user-btn {
-	text-align: left;
-	overflow-x: hidden;
-	width: 100px !important;
+    text-align: left;
+    overflow-x: hidden;
+    width: 100px !important;
 }
 
 form {
-	max-width: none;
-	&:not(:first-child) {
-		margin-top: 30px;
-	}
+    max-width: none;
+
+    &:not(:first-child) {
+        margin-top: 30px;
+    }
 }
 
 img {
-	width: 100%;
-	margin-bottom: 16px;
+    width: 100%;
+    margin-bottom: 16px;
 }
 
 .btn-group {
-	display: flex;
+    display: flex;
 }
 
 #json-textarea {
-	font-family: monospace;
-	font-size: 10px;
+    font-family: monospace;
+    font-size: 10px;
 }
 
 .form-check-input {
-	position: relative;
-	margin-left: 0;
+    position: relative;
+    margin-left: 0;
 }
