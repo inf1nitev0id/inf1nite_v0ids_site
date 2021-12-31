@@ -4,14 +4,30 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int    $id
+ * @property int    $user_id
+ * @property int    $rate
+ * @property string $date
+ * @property bool   $time
+ *
+ * @mixin Builder
+ */
 class MahoukaServerRating extends Model {
     use HasFactory;
 
     public $timestamps = false;
 
-// получение рейтинга пользователя
-    public static function getUserRatingArray($user_id) {
+    /**
+     * Получение рейтинга пользователя
+     *
+     * @param $user_id
+     *
+     * @return array
+     */
+    public static function getUserRatingArray($user_id): array {
         $query = MahoukaServerRating::select(
             'date',
             'time',
@@ -41,8 +57,12 @@ class MahoukaServerRating extends Model {
         return $result;
     }
 
-// получение наименьшей указанной даты в рейтинге
-    public static function getMinDate() {
+    /**
+     * Получение наименьшей указанной даты в рейтинге
+     *
+     * @return string
+     */
+    public static function getMinDate(): string {
         $join = MahoukaServerUser::select('join_date')
             ->where(
                 'join_date',
@@ -66,8 +86,12 @@ class MahoukaServerRating extends Model {
         );
     }
 
-// получение наибольшей указанной даты в рейтинге
-    public static function getMaxDate() {
+    /**
+     * Получение наибольшей указанной даты в рейтинге
+     *
+     * @return string
+     */
+    public static function getMaxDate(): string {
         $join = MahoukaServerUser::select('join_date')
             ->where(
                 'join_date',
@@ -91,8 +115,12 @@ class MahoukaServerRating extends Model {
         );
     }
 
-// получение даты и времени последнего записанного рейтинга
-    public static function getLastRate() {
+    /**
+     * Получение даты и времени последнего записанного рейтинга
+     *
+     * @return array|null
+     */
+    public static function getLastRate(): ?array {
         $query = MahoukaServerRating::select(
             'date',
             'time'

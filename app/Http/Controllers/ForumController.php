@@ -2,36 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Rating;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
+/**
+ * Констроллер форума
+ */
 class ForumController extends Controller {
-    private function isModerator() {
-        return Auth::user()->role !== 'user';
-    }
-
-    public function forum($id = 0) {
-        $page_id = intval($id);
-        if ($page_id == 0) {
-            $page_id = null;
+    /**
+     * @param int $id
+     *
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory|\Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+     */
+    public function forum(int $id = 0): \Illuminate\Contracts\View\View | \Illuminate\Contracts\View\Factory | \Illuminate\Routing\Redirector | \Illuminate\Http\RedirectResponse | \Illuminate\Contracts\Foundation\Application {
+        if ($id === 0) {
+            $id = null;
         }
-        $type           = 'catalog';
-        $current        = null;
-        $moderator_only = true;
-        $path           = Post::getPath($page_id);
+        $type          = 'catalog';
+        $current       = null;
+        $moderatorOnly = true;
+        $path          = Post::getPath($id);
 
-        if ($page_id != null) {
-            $current = Post::getPost($page_id);
-            if ($current == null) {
+        if ($id !== null) {
+            $current = Post::getPost($id);
+            if ($current === null) {
                 return abort(404);
             }
-            if ($current->type == 'comment') {
+            if ($current->type === 'comment') {
                 $post_id = null;
                 foreach ($path as $parent) {
-                    if ($parent['type'] == 'post') {
+                    if ($parent['type'] === 'post') {
                         $post_id = $parent['id'];
                         break;
                     }
@@ -40,36 +43,54 @@ class ForumController extends Controller {
                     route(
                         'forum',
                         $post_id
-                    )."#".$page_id
+                    )."#".$id
                 );
             }
-            if ($current->type == 'post') {
+            if ($current->type === 'post') {
                 $type = 'post';
             }
-            $moderator_only = $current->moderator_only;
+            $moderatorOnly = $current->moderator_only;
         }
 
-        $editable = Auth::check() && (!$moderator_only || $this->isModerator());
+        $editable = Auth::check() && (!$moderatorOnly || self::isModerator());
+
+        if ($id !== null) {
+            $pathStr = $current->type == 'catalog' ? $current->name : "";
+            foreach ($path as $parent) {
+                $pathStr = "<a href=\"".route(
+                        'forum',
+                        $parent['id']
+                    )."\">".$parent['name']." &gt;</a> ".$pathStr;
+            }
+            $pathStr = "<a href=\"".route('forum')."\"> &gt;</a> ".$pathStr;
+        } else {
+            $pathStr = null;
+        }
 
         return view(
             'forum',
             [
-                'id'             => $page_id,
+                'id'             => $id,
                 'type'           => $type,
                 'current'        => $current,
-                'current_rating' => Rating::getPostRating($page_id),
-                'path'           => $path,
+                'current_rating' => Rating::getPostRating($id),
+                'path'           => $pathStr,
                 'posts'          => $type == 'catalog'
-                    ? Post::getChilds($page_id)
+                    ? Post::getChildren($id)
                     : Post::getComments(
-                        $page_id
+                        $id
                     ),
                 'editable'       => $editable,
             ]
         );
     }
 
-    public function addComment(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+     */
+    public function addComment(Request $request): \Illuminate\Routing\Redirector | \Illuminate\Http\RedirectResponse | \Illuminate\Contracts\Foundation\Application {
         if (!Auth::check()) {
             return redirect()
                 ->back()
@@ -109,7 +130,12 @@ class ForumController extends Controller {
         );
     }
 
-    public function deleteComment(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function deleteComment(Request $request): \Illuminate\Routing\Redirector | \Illuminate\Http\RedirectResponse | \Illuminate\Contracts\Foundation\Application {
         if (!Auth::check()) {
             return redirect()
                 ->back()
@@ -130,7 +156,7 @@ class ForumController extends Controller {
                 ->back()
                 ->withErrors(['Комментария с таким ID не существует.']);
         }
-        if ($comment->user_id != Auth::user()->id && !$this->isModerator()) {
+        if ($comment->user_id != Auth::user()->id && !self::isModerator()) {
             return redirect()
                 ->back()
                 ->withErrors(['Вы не можете удалить данный комментарий.']);
@@ -147,7 +173,12 @@ class ForumController extends Controller {
         );
     }
 
-    public function addPostForm($id) {
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+     */
+    public function addPostForm($id): \Illuminate\Contracts\View\Factory | \Illuminate\Contracts\View\View | \Illuminate\Contracts\Foundation\Application | \Illuminate\Http\RedirectResponse {
         if (!Auth::check()) {
             return redirect()
                 ->back()
@@ -164,22 +195,38 @@ class ForumController extends Controller {
                 ->back()
                 ->withErrors(['Каталога с таким ID не существует.']);
         }
-        if ($catalog->moderator_only && !$this->isModerator()) {
+        if ($catalog->moderator_only && !self::isModerator()) {
             return redirect()
                 ->back()
                 ->withErrors(['Вы не можете добавлять посты в этот каталог.']);
         }
+        $path = "<a href=\"".route(
+                'forum',
+                $id
+            )."\">".$catalog->name." &gt;</a>";
+        foreach (Post::getPath($id) as $parent) {
+            $path = "<a href=\"".route(
+                'forum',
+                $parent['id']
+            )."\">".$parent['name']." &gt;</a> ".$path;
+        }
+        $path = "<a href=\"".route('forum')."\"> &gt;</a> ".$path;
         return view(
             'add_post_form',
             [
                 'id'      => $id,
-                'path'    => Post::getPath($id),
+                'path'    => $path,
                 'catalog' => $catalog,
             ]
         );
     }
 
-    public function addPost(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse
+     */
+    public function addPost(Request $request): \Illuminate\Routing\Redirector | \Illuminate\Contracts\Foundation\Application | \Illuminate\Http\RedirectResponse {
         if (!Auth::check()) {
             return redirect()
                 ->back()
@@ -202,7 +249,7 @@ class ForumController extends Controller {
                 ->back()
                 ->withErrors(['Каталога с таким ID не существует.']);
         }
-        if ($catalog->moderator_only && !$this->isModerator()) {
+        if ($catalog->moderator_only && !self::isModerator()) {
             return redirect()
                 ->back()
                 ->withErrors(['Вы не можете добавлять посты в этот каталог.']);
@@ -222,7 +269,12 @@ class ForumController extends Controller {
         );
     }
 
-    public function deletePost(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse|\Illuminate\Contracts\Foundation\Application
+     */
+    public function deletePost(Request $request): \Illuminate\Routing\Redirector | \Illuminate\Http\RedirectResponse | \Illuminate\Contracts\Foundation\Application {
         if (!Auth::check()) {
             return redirect()
                 ->back()
@@ -243,7 +295,7 @@ class ForumController extends Controller {
                 ->back()
                 ->withErrors(['Поста с таким ID не существует.']);
         }
-        if ($post->user_id != Auth::user()->id && !$this->isModerator()) {
+        if ($post->user_id != Auth::user()->id && !self::isModerator()) {
             return redirect()
                 ->back()
                 ->withErrors(['Вы не можете удалить данный пост.']);

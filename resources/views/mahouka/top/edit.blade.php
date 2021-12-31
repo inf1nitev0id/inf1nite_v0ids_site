@@ -102,7 +102,7 @@
                     <tr class="header">
                         <td>
                             <div class="btn-group">
-                                <a class="btn btn-outline-secondary" @click="saveData()">Сохранить</i></a>
+                                <a class="btn btn-outline-secondary" @click="saveData()">Сохранить</a>
                                 <a class="btn btn-outline-secondary mini-btn icon-btn" @click="clearInputs()"><i
                                         class="fas fa-broom"></i></a>
                                 <a class="btn btn-outline-secondary mini-btn icon-btn" @click="exchangeInputs()"><i

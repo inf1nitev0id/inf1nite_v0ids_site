@@ -8,8 +8,16 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Invite;
 
+/**
+ * Контроллер аутентификации
+ */
 class LoginController extends Controller {
-    public static function getFrom($from) {
+    /**
+     * @param $from
+     *
+     * @return string
+     */
+    public static function getFrom($from): string {
         switch ($from) {
             case 'mahouka':
                 return route('mahouka.home');
@@ -18,7 +26,12 @@ class LoginController extends Controller {
         }
     }
 
-    public function authenticate(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function authenticate(Request $request): \Illuminate\Http\RedirectResponse {
         if (
             !Auth::attempt(
                 ['email' => $request->login, 'password' => $request->password],
@@ -39,7 +52,12 @@ class LoginController extends Controller {
         return redirect()->intended($this->getFrom($request->from));
     }
 
-    public function register(Request $request) {
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function register(Request $request): \Illuminate\Http\RedirectResponse {
         $request->validate([
                                'login'    => 'required|alpha_dash|min:3|max:20',
                                'email'    => 'required|email',

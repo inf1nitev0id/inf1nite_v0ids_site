@@ -1,4 +1,13 @@
 @extends('layouts.mahouka')
+<?php
+['min_date' => "\DateTime|false", 'users' => "array", 'rating' => "array"]
+/**
+ * @var array           $rating
+ * @var array           $users
+ * @var \DateTime|false $min_date
+ * @var \DateInterval   $step
+ */
+?>
 
 @section('title') Статистика сервера @endsection
 

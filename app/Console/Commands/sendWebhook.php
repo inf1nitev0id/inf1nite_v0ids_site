@@ -20,7 +20,7 @@ class sendWebhook extends Command {
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Отправляет рейтинг на дискорд-сервер через вебхук.';
 
     /**
      * Create a new command instance.
@@ -31,7 +31,7 @@ class sendWebhook extends Command {
         parent::__construct();
     }
 
-    private $chars = [
+    private array $chars = [
         'original' => ['*', '~', '_', '`'],
         'replace'  => ['\\*', '\\~', '\\_', '\\`'],
     ];
@@ -41,7 +41,7 @@ class sendWebhook extends Command {
      *
      * @return int
      */
-    public function handle() {
+    public function handle(): int {
         $users      = MahoukaServerUser::getSortedUsers(
             null,
             false,

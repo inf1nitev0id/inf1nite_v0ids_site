@@ -36,7 +36,7 @@ class writeRating extends Command {
      *
      * @return int
      */
-    public function handle() {
+    public function handle(): int {
         $start = microtime(true);
         $time  = intval($this->argument('time'));
         if (!($time == 0 || $time == 1)) {

@@ -4,11 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int    $id
+ * @property string $name
+ * @property string $text
+ * @property int    $parent_id
+ * @property string $type
+ * @property int    $user_id
+ * @property bool   $deleted
+ * @property bool   $moderator_only
+ * @property string $created_at
+ * @property string $updated_at
+ *
+ * @mixin Builder
+ */
 class Post extends Model {
     use HasFactory;
 
-    public static function getPost($id) {
+    /**
+     * @param $id
+     *
+     * @return \App\Models\Post|null
+     */
+    public static function getPost($id): ?Post {
         return Post
             ::select(
                 'posts.id as id',
@@ -36,7 +56,12 @@ class Post extends Model {
             ->first();
     }
 
-    public static function getChilds($id) {
+    /**
+     * @param $id
+     *
+     * @return array|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function getChildren($id): array | \Illuminate\Database\Eloquent\Collection {
         return Post
             ::selectRaw(
                 'p.`id` as `id`, p.`name` as `name`, p.`text`, '.
@@ -77,7 +102,12 @@ class Post extends Model {
             ->get();
     }
 
-    public static function getComments($id) {
+    /**
+     * @param $id
+     *
+     * @return Post[]
+     */
+    public static function getComments($id): array {
         $comments = Post
             ::select(
                 'posts.id as id',
@@ -122,7 +152,12 @@ class Post extends Model {
         return $result;
     }
 
-    public static function getPath($id) {
+    /**
+     * @param $id
+     *
+     * @return array[]
+     */
+    public static function getPath($id): array {
         $path = [];
         $id_d = $id;
         while ($id_d != null) {
@@ -148,12 +183,18 @@ class Post extends Model {
         return $path;
     }
 
-    public static function deleteComment($id, $hard = true) {
+    /**
+     * @param int  $id
+     * @param bool $hard
+     *
+     * @return mixed
+     */
+    public static function deleteComment(int $id, bool $hard = true) {
         $comment   = Post::getPost($id);
         $undeleted = $id;
         if ($comment->type == 'comment') {
             if (
-                Post::getChilds($id)
+                Post::getChildren($id)
                     ->count() > 0
             ) {
                 $comment->deleted = true;

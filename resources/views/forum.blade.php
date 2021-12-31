@@ -1,4 +1,15 @@
 @extends('layouts.main')
+<?php
+/**
+ * @var int              $id
+ * @var string           $type
+ * @var \App\Models\Post $current
+ * @var array            $current_rating
+ * @var array            $path
+ * @var array            $posts
+ * @var bool             $editable
+ */
+?>
 
 @section('title') {{$id != null ? $current->name." - " : ""}}Форум @endsection
 
@@ -9,18 +20,9 @@
 
 @section('content')
     <?php
-    $is_moderator = Auth::check() && Auth::user()->role !== 'user';
+    use Illuminate\Support\Facades\Auth;
 
-    if ($id != null) {
-        $path_str = $current->type == 'catalog' ? $current->name : "";
-        foreach ($path as $parent) {
-            $path_str = "<a href=\"".route(
-                    'forum',
-                    $parent['id']
-                )."\">".$parent['name']." &gt;</a> ".$path_str;
-        }
-        $path_str = "<a href=\"".route('forum')."\"> &gt;</a> ".$path_str;
-    }
+    $is_moderator = \App\Http\Controllers\ForumController::isModerator();
 
     function text_to_html($text) {
         return str_replace(
@@ -35,23 +37,6 @@
             return Auth::user()->id == $user_id;
         else
             return null;
-    }
-
-    function printRating($id, $rating, $user_id) {
-    return;
-    $a = Auth::check();
-    $self = isAuthor($user_id);
-    if($a && !$self) { ?>
-    <i class="fas fa-thumbs-up btn btn-light" data-action="like" title="Лайк"></i>
-    <?php } ?>
-    <span id="rating{{$id}}">
-				<span class="btn disabled rating" title="+{{$rating['positive']}} | -{{$rating['negative']}}">
-					{{$rating['positive'] - $rating['negative']}}
-				</span>
-			</span>
-    <?php if($a && !$self) { ?>
-    <i class="fas fa-thumbs-down btn btn-light" data-action="dislike" title="Дизлайк"></i>
-    <?php }
     }
     ?>
     <div id="forum">
@@ -74,7 +59,7 @@
                     <thead>
                     <tr>
                         <th colspan=3>
-                            <?php echo $path_str ?><br/>
+                            @if($path){!! $path !!}<br/>@endif
                             <small>{{$current->text}}</small>
                         </th>
                     </tr>
@@ -126,7 +111,7 @@
                         {{$current->created_at}}
                     </div>
                 </div>
-                <h6><?php echo $path_str ?></h6>
+                <h6>{!! $path !!}</h6>
                 <hr/>
                 <p class="text-justify"><?php echo text_to_html($current->text); ?></p>
                 <div class="text-right" data-id="{{$current->id}}">
@@ -154,58 +139,59 @@
                             </div>
                         </div>
                     @endif
-                    {{printRating($current->id, $current_rating, $current->user_id)}}
                 </div>
                 <hr/>
                 <?php
+                /**
+                 * @param $list
+                 * @param $is_moderator
+                 * @return void
+                 */
                 function printComments($list, $is_moderator) {
-                global $auth;
-                foreach ($list as $comment) {
-                ?>
-                <div class="comment_box">
-                    <a name="{{$comment['comment']['id']}}"/>
-                    <div id="comment{{$comment['comment']['id']}}">
-                        @if (!$comment['comment']['deleted'])
-                            <div class="comment comment-header d-flex">
-                                <a href="">{{$comment['comment']['user_name']}}</a>
-                                <span class="mx-2 text-muted">{{$comment['comment']['time']}}</span>
-                                <a href="#{{$comment['comment']['id']}}">#</a>
+                    global $auth;
+                    foreach ($list as $comment) {
+                        ?>
+                        <div class="comment_box">
+                            <a name="{{$comment['comment']['id']}}"></a>
+                            <div id="comment{{$comment['comment']['id']}}">
+                                @if (!$comment['comment']['deleted'])
+                                    <div class="comment comment-header d-flex">
+                                        <a href="">{{$comment['comment']['user_name']}}</a>
+                                        <span class="mx-2 text-muted">{{$comment['comment']['time']}}</span>
+                                        <a href="#{{$comment['comment']['id']}}">#</a>
+                                    </div>
+                                @endif
+                                <div class="comment comment-body" id="comment_text{{$comment['comment']['id']}}">
+                                    <?php echo $comment['comment']['deleted']
+                                        ? "<span class=\"text-muted\">КОММЕНТАРИЙ УДАЛЁН</span>"
+                                        : text_to_html(
+                                            $comment['comment']['text']
+                                        ); ?>
+                                </div>
+                                @if (!$comment['comment']['deleted'])
+                                    <div class="comment comment-footer d-flex" data-id="{{$comment['comment']['id']}}">
+                                        <div>
+                                            @if(Auth::check())
+                                                <i id="reply{{$comment['comment']['id']}}-btn"
+                                                   class="fas fa-reply btn btn-light" data-action="reply" title="Ответить"></i>
+                                            @endif
+                                        </div>
+                                        <div class="ml-auto">
+                                            @if(Auth::check() && (isAuthor($comment['comment']['user_id']) || $is_moderator))
+                                                <i class="fas fa-times btn btn-light ml-auto{{ !isAuthor($comment['comment']['user_id']) && $is_moderator ? ' red' : '' }}"
+                                                   data-id="{{$comment['comment']['id']}}" data-action="delete" title="Удалить"
+                                                   data-toggle="modal" data-target="#deleteModal"></i>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
-                        <div class="comment comment-body" id="comment_text{{$comment['comment']['id']}}">
-                            <?php echo $comment['comment']['deleted']
-                                ? "<span class=\"text-muted\">КОММЕНТАРИЙ УДАЛЁН</span>"
-                                : text_to_html(
-                                    $comment['comment']['text']
-                                ); ?>
+                            {{printComments($comment['childs'], $is_moderator)}}
+                            <div class="comment_box" id="reply{{$comment['comment']['id']}}" hidden>
+                            </div>
                         </div>
-                        @if (!$comment['comment']['deleted'])
-                            <div class="comment comment-footer d-flex" data-id="{{$comment['comment']['id']}}">
-                                <div>
-                                    @if(Auth::check())
-                                        <i id="reply{{$comment['comment']['id']}}-btn"
-                                           class="fas fa-reply btn btn-light" data-action="reply" title="Ответить"></i>
-                                    @endif
-                                </div>
-                                <div class="ml-auto">
-                                    @if(Auth::check() && (isAuthor($comment['comment']['user_id']) || $is_moderator))
-                                        <i class="fas fa-times btn btn-light ml-auto{{ !isAuthor($comment['comment']['user_id']) && $is_moderator ? ' red' : '' }}"
-                                           data-id="{{$comment['comment']['id']}}" data-action="delete" title="Удалить"
-                                           data-toggle="modal" data-target="#deleteModal"></i>
-                                    @endif
-                                </div>
-                                <div>
-                                    {{printRating($comment['comment']['id'], $comment['comment']['rating'], $comment['comment']['user_id'])}}
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                    {{printComments($comment['childs'], $is_moderator)}}
-                    <div class="comment_box" id="reply{{$comment['comment']['id']}}" hidden>
-                    </div>
-                </div>
-                <?php
-                }
+                        <?php
+                    }
                 }
 
                 if (count($posts) == 0) {

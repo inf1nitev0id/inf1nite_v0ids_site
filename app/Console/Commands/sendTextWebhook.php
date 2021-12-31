@@ -18,7 +18,7 @@ class sendTextWebhook extends Command {
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Отправляет текстовое сообщение на дискорд-сервер через вебхук.';
 
     /**
      * Create a new command instance.
@@ -34,7 +34,7 @@ class sendTextWebhook extends Command {
      *
      * @return int
      */
-    public function handle() {
+    public function handle(): int {
         $url        = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('mahouka-bot-channel-webhook');
         $hookObject = [
             "content" => "".$this->argument('text'),

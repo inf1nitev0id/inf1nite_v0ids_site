@@ -1,25 +1,17 @@
 @extends('layouts.main')
+<?php
+/**
+ * @var int              $id
+ * @var string           $path
+ * @var \App\Models\Post $catalog
+ */
+?>
 
 @section('title') Добавить пост @endsection
 
 @section('content')
-    <?php
-    if ($id != null) {
-        $path_str = "<a href=\"".route(
-                'forum',
-                $id
-            )."\">".$catalog->name." &gt;</a>";
-        foreach ($path as $parent) {
-            $path_str = "<a href=\"".route(
-                    'forum',
-                    $parent['id']
-                )."\">".$parent['name']." &gt;</a> ".$path_str;
-        }
-        $path_str = "<a href=\"".route('forum')."\"> &gt;</a> ".$path_str;
-    }
-    ?>
     <h3>Добавление поста</h3>
-    <b><?php echo $path_str ?></b>
+    <b>{!!$path!!}</b>
     <form method="post" action="{{route('forum.add-post')}}">
         @csrf
         <input type="hidden" name="id" value="{{$id}}"/>

@@ -10,10 +10,18 @@ use App\Models\MahoukaServerNumber;
 use App\Models\MahoukaServerEvent;
 use App\Models\MahoukaSeries;
 use App\Models\ApiKeys;
+use JetBrains\PhpStorm\ArrayShape;
 
+/**
+ * Контроллер раздела рейтинга дискорд-сервера
+ */
 class MahoukaServerRatingController extends Controller {
-// страница редактирования рейтинга
-    public function edit() {
+    /**
+     * Страница редактирования рейтинга
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+     */
+    public function edit(): \Illuminate\Contracts\View\Factory | \Illuminate\Contracts\View\View | \Illuminate\Contracts\Foundation\Application {
         $top              = $this->top();
         $top['last_date'] = MahoukaServerRating::getMaxDate() ?? date('Y-m-d');
         foreach ($top['users'] as &$user) {
@@ -30,7 +38,13 @@ class MahoukaServerRatingController extends Controller {
         );
     }
 
-    private function getJsonFormApi($url, $headers) {
+    /**
+     * @param $url
+     * @param $headers
+     *
+     * @return bool|string
+     */
+    private function getJsonFormApi($url, $headers): bool | string {
         $options = ['http' => $headers];
         $context = stream_context_create($options);
         try {
@@ -50,7 +64,10 @@ class MahoukaServerRatingController extends Controller {
         return $result;
     }
 
-    public function getRatingFromApi() {
+    /**
+     * @return \Illuminate\Http\JsonResponse|null
+     */
+    public function getRatingFromApi(): ?\Illuminate\Http\JsonResponse {
         $result = $this->getJsonFormApi(
             'https://api.tatsu.gg/v1/guilds/763030341103255582/rankings/all',
             [
@@ -66,7 +83,12 @@ class MahoukaServerRatingController extends Controller {
         }
     }
 
-    public function getUserDataFromApi($id) {
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Http\JsonResponse|null
+     */
+    public function getUserDataFromApi($id): ?\Illuminate\Http\JsonResponse {
         $result = $this->getJsonFormApi(
             'https://discord.com/api/v8/users/'.$id,
             [
@@ -82,8 +104,14 @@ class MahoukaServerRatingController extends Controller {
         }
     }
 
-// обработка и проверка правильности данных перез загрузкой
-    public function scan(Request $request) {
+    /**
+     * Обработка и проверка правильности данных перез загрузкой
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function scan(Request $request): \Illuminate\Http\JsonResponse {
         $request->validate([
                                'url' => 'url|required',
                            ]);
@@ -245,7 +273,8 @@ class MahoukaServerRatingController extends Controller {
         foreach ($binary as $row) {
             $unknown = false;
             $hash    = md5(json_encode($row['name']));
-            $query   = MahoukaServerHash::select('user_id')
+            $query   = MahoukaServerHash
+                ::select('user_id')
                 ->where(
                     'hash',
                     '=',
@@ -297,6 +326,11 @@ class MahoukaServerRatingController extends Controller {
                                 ]);
     }
 
+    /**
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return void
+     */
     public function load(Request $request) {
         $users = $request->users;
         $date  = substr(
@@ -356,17 +390,22 @@ class MahoukaServerRatingController extends Controller {
         );
     }
 
-// загрузка хешей для новых ников и цифр в БД
-    public function load_hashes(Request $request) {
+    /**
+     * Загрузка хешей для новых ников и цифр в БД
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function load_hashes(Request $request): \Illuminate\Http\RedirectResponse {
         $array = $request->all();
         foreach ($array as $key => $value) {
             if ($value != -1) {
                 if (
-                    substr(
+                    str_starts_with(
                         $key,
-                        0,
-                        4
-                    ) === "name"
+                        "name"
+                    )
                 ) {
                     $hash = substr(
                         $key,
@@ -388,11 +427,10 @@ class MahoukaServerRatingController extends Controller {
                     }
                 } else {
                     if (
-                        substr(
+                        str_starts_with(
                             $key,
-                            0,
-                            6
-                        ) === "number"
+                            "number"
+                        )
                     ) {
                         $hash = substr(
                             $key,
@@ -419,8 +457,14 @@ class MahoukaServerRatingController extends Controller {
         return redirect()->back();
     }
 
-// запись введённых данных в БД
-    public function write_rate(Request $request) {
+    /**
+     * Запись введённых данных в БД
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function write_rate(Request $request): \Illuminate\Http\RedirectResponse {
         $array = $request->all();
         foreach ($array as $key => $value) {
             if (is_int($key)) {
@@ -443,8 +487,12 @@ class MahoukaServerRatingController extends Controller {
         return redirect()->route('mahouka.top.load');
     }
 
-// получение данных о рейтинге из БД
-    private function top() {
+    /**
+     * Получение данных о рейтинге из БД
+     *
+     * @return array
+     */
+    #[ArrayShape(['min_date' => "\DateTime|false", 'users' => "array", 'rating' => "array"])] private function top(): array {
         $sorted_users = MahoukaServerUser::getSortedUsers();
         $min_date     = \DateTime::createFromFormat(
             'Y-m-d',
@@ -474,8 +522,12 @@ class MahoukaServerRatingController extends Controller {
         ];
     }
 
-// вывод рейтинга в виде таблицы
-    public function table() {
+    /**
+     * Вывод рейтинга в виде таблицы
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function table(): \Illuminate\Contracts\View\View | \Illuminate\Contracts\View\Factory | \Illuminate\Contracts\Foundation\Application {
         $top         = $this->top();
         $top['step'] = new \DateInterval('P1D');
         return view(
@@ -484,11 +536,15 @@ class MahoukaServerRatingController extends Controller {
         );
     }
 
-// создание уникальных цветов для каждого графика
-    private static function getColor($id) {
-        $r;
-        $g;
-        $b;
+    /**
+     * Создание уникальных цветов для каждого графика
+     *
+     * @param $id
+     *
+     * @return string
+     */
+    private static function getColor($id): string {
+        $r = $g = $b = 0;
         $n1 = 200;
         $n0 = 0;
         switch ($id % 6) {
@@ -532,8 +588,12 @@ class MahoukaServerRatingController extends Controller {
         return 'rgb('.$r.','.$g.','.$b.')';
     }
 
-// подготовка данных для отрисовки графика
-    public function chart() {
+    /**
+     * Подготовка данных для отрисовки графика
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function chart(): \Illuminate\Contracts\View\View | \Illuminate\Contracts\View\Factory | \Illuminate\Contracts\Foundation\Application {
         $top   = $this->top();
         $lines = [];
         $days  = count($top['rating']);
@@ -574,17 +634,11 @@ class MahoukaServerRatingController extends Controller {
             if ($event['series_id'] !== null) {
                 $event['series_id'] = $series_i[$event['series_id']]['id'];
             }
-            switch ($event['type']) {
-                case 'release':
-                    $event['type'] = 0;
-                    break;
-                case 'announcement':
-                    $event['type'] = 1;
-                    break;
-                default:
-                    $event['type'] = 2;
-                    break;
-            }
+            $event['type'] = match ($event['type']) {
+                'release'      => 0,
+                'announcement' => 1,
+                default        => 2,
+            };
         }
 
         return view(

@@ -4,23 +4,43 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * @property int    $id
+ * @property string $name
+ * @property int    $discord_id
+ * @property string $alias
+ * @property bool   $hidden
+ * @property string $join_date
+ *
+ * @mixin Builder
+ */
 class MahoukaServerUser extends Model {
     use HasFactory;
 
     public $timestamps = false;
 
-// получение массива пользователей, отсортированных по последнему рейтингу
-    public static function getSortedUsers($date = null, $with_hidden = false, $only_last = false) {
+    /**
+     * Получение массива пользователей, отсортированных по последнему рейтингу
+     *
+     * @param $date
+     * @param $with_hidden
+     * @param $only_last
+     *
+     * @return array
+     */
+    public static function getSortedUsers($date = null, $with_hidden = false, $only_last = false): array {
         $query_users = null;
         if ($with_hidden) {
             $query_users = MahoukaServerUser::all();
         } else {
-            $query_users = MahoukaServerUser::where(
-                'hidden',
-                '=',
-                'false'
-            )
+            $query_users = MahoukaServerUser
+                ::where(
+                    'hidden',
+                    '=',
+                    'false'
+                )
                 ->get();
         }
         $users     = [];
@@ -36,10 +56,11 @@ class MahoukaServerUser extends Model {
             if ($date != null) {
                 $where[] = ['date', '=', $date];
             }
-            $query_rate = MahoukaServerRating::select(
-                'rate',
-                'date'
-            )
+            $query_rate = MahoukaServerRating
+                ::select(
+                    'rate',
+                    'date'
+                )
                 ->where($where)
                 ->orderBy(
                     'date',
@@ -79,11 +100,18 @@ class MahoukaServerUser extends Model {
         return $users;
     }
 
+    /**
+     * @param $id
+     * @param $discord_id
+     *
+     * @return void
+     */
     public static function setDiscordId($id, $discord_id) {
-        MahoukaServerUser::where(
-            'id',
-            $id
-        )
+        MahoukaServerUser
+            ::where(
+                'id',
+                $id
+            )
             ->update(['discord_id' => $discord_id]);
     }
 }
