@@ -13,10 +13,27 @@ use JetBrains\PhpStorm\ArrayShape;
  * @property int  $user_id
  * @property bool $value
  *
+ * @property Post $post
+ * @property User $user
+ *
  * @mixin Builder
  */
 class Rating extends Model {
     use HasFactory;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function post(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('Post');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('User');
+    }
 
     /**
      * @param $id

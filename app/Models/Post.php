@@ -18,10 +18,51 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string $created_at
  * @property string $updated_at
  *
+ * @property Post   $parent
+ * @property Post[] $children
+ * @property User $user
+ * @property Rating[] $ratings
+ *
  * @mixin Builder
  */
 class Post extends Model {
     use HasFactory;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo(
+            'Post',
+            'id',
+            'parent_id'
+        );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function children(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany(
+            'Post',
+            'parent_id',
+            'id'
+        );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('User');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('Rating');
+    }
 
     /**
      * @param $id

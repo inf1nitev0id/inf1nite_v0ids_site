@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @property int    $id
- * @property string $name
- * @property string $color
+ * @property int                  $id
+ * @property string               $name
+ * @property string               $color
+ *
+ * @property MahoukaServerEvent[] $events
  *
  * @mixin Builder
  */
@@ -17,6 +19,13 @@ class MahoukaSeries extends Model {
     use HasFactory;
 
     public $timestamps = false;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function events(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('MahoukaServerEvent');
+    }
 
     /**
      * @return array

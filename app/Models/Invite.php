@@ -12,10 +12,19 @@ use Illuminate\Database\Eloquent\Builder;
  * @property int    $usages
  * @property string $description
  *
+ * @property User[] $users
+ *
  * @mixin Builder
  */
 class Invite extends Model {
     use HasFactory;
 
     public $timestamps = false;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('User');
+    }
 }

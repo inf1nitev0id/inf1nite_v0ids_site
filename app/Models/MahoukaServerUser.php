@@ -7,12 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @property int    $id
- * @property string $name
- * @property int    $discord_id
- * @property string $alias
- * @property bool   $hidden
- * @property string $join_date
+ * @property int                   $id
+ * @property string                $name
+ * @property int                   $discord_id
+ * @property string                $alias
+ * @property bool                  $hidden
+ * @property string                $join_date
+ *
+ * @property MahoukaServerRating[] $ratings
+ * @property MahoukaServerHash[]   $hashes
  *
  * @mixin Builder
  */
@@ -20,6 +23,20 @@ class MahoukaServerUser extends Model {
     use HasFactory;
 
     public $timestamps = false;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('MahoukaServerRating');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function hashes(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('MahoukaServerHash');
+    }
 
     /**
      * Получение массива пользователей, отсортированных по последнему рейтингу

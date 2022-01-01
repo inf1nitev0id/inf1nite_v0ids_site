@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @property int    $id
- * @property int    $user_id
- * @property int    $rate
- * @property string $date
- * @property bool   $time
+ * @property int               $id
+ * @property int               $user_id
+ * @property int               $rate
+ * @property string            $date
+ * @property bool              $time
+ *
+ * @property MahoukaServerUser $user
  *
  * @mixin Builder
  */
@@ -21,6 +23,13 @@ class MahoukaServerRating extends Model {
     public $timestamps = false;
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('MahoukaServerUser');
+    }
+
+    /**
      * Получение рейтинга пользователя
      *
      * @param $user_id
@@ -28,7 +37,7 @@ class MahoukaServerRating extends Model {
      * @return array
      */
     public static function getUserRatingArray($user_id): array {
-        $query = MahoukaServerRating::select(
+        $query  = MahoukaServerRating::select(
             'date',
             'time',
             'rate'

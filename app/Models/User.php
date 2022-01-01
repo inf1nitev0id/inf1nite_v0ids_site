@@ -10,16 +10,21 @@ use Illuminate\Database\Eloquent\Builder;
 
 
 /**
- * @property int       $id
- * @property string    $name
- * @property string    $email
- * @property \DateTime $email_verified_at
- * @property string    $password
- * @property int       $invite_id
- * @property string    $role
- * @property string    $remember_token
- * @property string    $created_at
- * @property string    $updated_at
+ * @property int            $id
+ * @property string         $name
+ * @property string         $email
+ * @property \DateTime      $email_verified_at
+ * @property string         $password
+ * @property int            $invite_id
+ * @property string         $role
+ * @property string         $remember_token
+ * @property string         $created_at
+ * @property string         $updated_at
+ *
+ * @property Invite         $invite
+ * @property Post[]         $catalogs
+ * @property Post[]         $posts
+ * @property Post[]         $comments
  *
  * @mixin Builder
  */
@@ -56,6 +61,59 @@ class User extends Authenticatable {
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function invite(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('Invite');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function catalogs(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('Post')
+            ->where(
+                'type',
+                '=',
+                'catalog'
+            );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function posts(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('Post')
+            ->where(
+                'type',
+                '=',
+                'post'
+            );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comments(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('Post')
+            ->where(
+                'type',
+                '=',
+                'comment'
+            );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('Rating');
+    }
+
+    /**
+     * @return bool
+     */
     public function isModerator(): bool {
         return $this->role !== 'user';
     }

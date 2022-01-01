@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * @property int    $id
- * @property string $name
- * @property string $date
- * @property string $type
- * @property bool   $important
- * @property int    $series_id
+ * @property int           $id
+ * @property string        $name
+ * @property string        $date
+ * @property string        $type
+ * @property bool          $important
+ * @property int           $series_id
+ *
+ * @property MahoukaSeries $series
  *
  * @mixin Builder
  */
@@ -20,6 +22,13 @@ class MahoukaServerEvent extends Model {
     use HasFactory;
 
     public $timestamps = false;
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function series(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('MahoukaSeries');
+    }
 
     /**
      * Получение списка событий
