@@ -68,7 +68,7 @@ class ForumController extends Controller {
         }
 
         return view(
-            'forum',
+            'forum/index',
             [
                 'id'             => $id,
                 'type'           => $type,
@@ -212,7 +212,7 @@ class ForumController extends Controller {
         }
         $path = "<a href=\"".route('forum')."\"> &gt;</a> ".$path;
         return view(
-            'add_post_form',
+            'forum/add_post',
             [
                 'id'      => $id,
                 'path'    => $path,

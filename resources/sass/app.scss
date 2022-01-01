@@ -17,7 +17,6 @@ ul > li {
 
 form {
     width: 100%;
-    max-width: 350px;
     text-align: left;
 
     .form-group {
@@ -25,7 +24,8 @@ form {
     }
 }
 
-.form-login {
+form.form-login {
+    max-width: 350px;
     margin: 0 auto;
 }
 
