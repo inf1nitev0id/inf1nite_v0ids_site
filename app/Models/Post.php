@@ -253,4 +253,18 @@ class Post extends Model {
         }
         return $undeleted;
     }
+
+    public function getFormattedText() {
+        $strings = explode("\n", str_replace(["\r\n", "\r"], "\n", $this->text));
+
+        $formattedText = '';
+        foreach ($strings as $string) {
+            $formattedText .= preg_replace_callback('/#link#(.+?)#/', function($match) {
+                $params = explode('|', $match[1], 2);
+                return '<a href="'.$params[0].'" target="_blank">'.($params[1] ?? $params[0]).'</a>';
+            }, $string).'<br />'.PHP_EOL;
+        }
+
+        return $formattedText;
+    }
 }

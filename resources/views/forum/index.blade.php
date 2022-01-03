@@ -24,14 +24,6 @@
 
     $is_moderator = \App\Http\Controllers\ForumController::isModerator();
 
-    function text_to_html($text) {
-        return str_replace(
-            ["\r\n", "\r", "\n"],
-            '<br />',
-            $text
-        );
-    }
-
     function isAuthor($user_id) {
         if (Auth::check())
             return Auth::user()->id == $user_id;
@@ -60,7 +52,7 @@
                     <tr>
                         <th colspan=3>
                             @if($path){!! $path !!}<br/>@endif
-                            <small>{{$current->text}}</small>
+                            <small>{!! $current->getFormattedText() !!}</small>
                         </th>
                     </tr>
                     </thead>
@@ -113,7 +105,7 @@
                 </div>
                 <h6>{!! $path !!}</h6>
                 <hr/>
-                <p class="text-justify"><?php echo text_to_html($current->text); ?></p>
+                <p class="text-justify">{!! $current->getFormattedText() !!}</p>
                 <div class="text-right" data-id="{{$current->id}}">
                     @if(Auth::check() && (isAuthor($current->user_id) || $is_moderator))
                         <i class="fas fa-times btn btn-light ml-auto{{ !isAuthor($current->user_id) && $is_moderator ? ' red' : '' }}"
