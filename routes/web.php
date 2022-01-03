@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForumController;
@@ -119,9 +120,7 @@ Route::prefix('mahouka')
     ->group(function() {
         Route::get(
             '/',
-            function() {
-                return view('mahouka.home');
-            }
+            [MahoukaServerRatingController::class, 'index']
         )
             ->name('home');
 

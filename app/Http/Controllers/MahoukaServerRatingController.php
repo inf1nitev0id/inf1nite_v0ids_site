@@ -10,12 +10,42 @@ use App\Models\MahoukaServerNumber;
 use App\Models\MahoukaServerEvent;
 use App\Models\MahoukaSeries;
 use App\Models\ApiKeys;
+use Illuminate\Support\Facades\Auth;
 use JetBrains\PhpStorm\ArrayShape;
+use MongoDB\Driver\Session;
 
 /**
  * Контроллер раздела рейтинга дискорд-сервера
  */
 class MahoukaServerRatingController extends Controller {
+    /**
+     * Execute an action on the controller.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function callAction($method, $parameters) {
+        $menu = session('hiddenMenu');
+        if ($menu === null) {
+            session(['hiddenMenu' => []]);
+            $menu = [];
+        }
+        if (!in_array('mahouka', $menu)) {
+            $menu[] = 'mahouka';
+            session(['hiddenMenu' => $menu]);
+        }
+
+        return parent::callAction($method, $parameters);
+    }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+     */
+    public function index(): \Illuminate\Contracts\View\Factory | \Illuminate\Contracts\View\View | \Illuminate\Contracts\Foundation\Application {
+        return view('mahouka.home');
+    }
+
     /**
      * Страница редактирования рейтинга
      *
