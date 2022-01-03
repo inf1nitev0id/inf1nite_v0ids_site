@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property Post[]         $catalogs
  * @property Post[]         $posts
  * @property Post[]         $comments
+ * @property AttachedFile[] $attachedFiles
  *
  * @mixin Builder
  */
@@ -109,6 +110,13 @@ class User extends Authenticatable {
      */
     public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany('Rating');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function attachedFiles(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('AttachedFiles');
     }
 
     /**

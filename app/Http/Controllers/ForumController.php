@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AttachedFile;
+use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Post;
@@ -185,12 +187,7 @@ class ForumController extends Controller {
                 ->withErrors(['Авторизуйтесь, чтобы создать пост.']);
         }
         $catalog = Post::getPost($id);
-        if ($catalog == null) {
-            return redirect()
-                ->back()
-                ->withErrors(['Каталога с таким ID не существует.']);
-        }
-        if ($catalog->type != 'catalog') {
+        if ($catalog == null || $catalog->type !== 'catalog') {
             return redirect()
                 ->back()
                 ->withErrors(['Каталога с таким ID не существует.']);
@@ -200,17 +197,10 @@ class ForumController extends Controller {
                 ->back()
                 ->withErrors(['Вы не можете добавлять посты в этот каталог.']);
         }
-        $path = "<a href=\"".route(
-                'forum',
-                $id
-            )."\">".$catalog->name." &gt;</a>";
+        $path = "<a href=\"".route('forum')."\"> &gt;</a> <a href=\"".route('forum', $id)."\">".$catalog->name." &gt;</a>";
         foreach (Post::getPath($id) as $parent) {
-            $path = "<a href=\"".route(
-                'forum',
-                $parent['id']
-            )."\">".$parent['name']." &gt;</a> ".$path;
+            $path = "<a href=\"".route('forum', $parent['id'])."\">".$parent['name']." &gt;</a> ".$path;
         }
-        $path = "<a href=\"".route('forum')."\"> &gt;</a> ".$path;
         return view(
             'forum/add_post',
             [
@@ -261,6 +251,21 @@ class ForumController extends Controller {
         $post->name      = $request->input('title');
         $post->text      = $request->input('text');
         $post->save();
+
+        foreach ($request->file('attachments') as $key => $file) {
+            $dbFile = new File();
+            $dbFile->name = $request->input('attachments-names')[$key] ?: $file->getClientOriginalName();
+            $dbFile->setContent('forum/'.md5($dbFile->name.time()).'.'.$file->getClientOriginalExtension(), $file->getContent());
+            $dbFile->user_id = Auth::user()->id;
+            $dbFile->module = File::MODULE_FORUM;
+            $dbFile->save();
+
+            $attachedFile = new AttachedFile();
+            $attachedFile->post_id = $post->id;
+            $attachedFile->file_id = $dbFile->id;
+            $attachedFile->save();
+        }
+
         return redirect(
             route(
                 'forum',

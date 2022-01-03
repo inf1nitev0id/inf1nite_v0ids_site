@@ -65,3 +65,28 @@ table.rating tr:not(:first-child):nth-child(even) {
 [v-cloak] {
   display: none;
 }
+
+div.file-input {
+  display: flex;
+  flex-direction: column;
+}
+div.file-input input[type=file] {
+  display: none;
+}
+div.file-input div.btn-group {
+  margin-top: 10px;
+}
+div.file-input div.btn-group button {
+  height: 38px;
+  width: 38px;
+  padding: 2px;
+}
+div.file-input div.btn-group button > img {
+  height: 100%;
+  width: 100%;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+div.file-input div.btn-group input[type=text] {
+  z-index: 1;
+}

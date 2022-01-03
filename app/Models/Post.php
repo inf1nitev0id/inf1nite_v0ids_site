@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @property Post[] $children
  * @property User $user
  * @property Rating[] $ratings
+ * @property AttachedFile[] $files
  *
  * @mixin Builder
  */
@@ -62,6 +63,13 @@ class Post extends Model {
      */
     public function ratings(): \Illuminate\Database\Eloquent\Relations\HasMany {
         return $this->hasMany('Rating');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function files(): \Illuminate\Database\Eloquent\Relations\HasMany {
+        return $this->hasMany('AttachedFile');
     }
 
     /**

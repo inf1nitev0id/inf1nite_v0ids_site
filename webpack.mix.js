@@ -11,11 +11,21 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
+mix
+    .disableNotifications()
+    .webpackConfig({
+    resolve: {
+        alias: {
+            vue: 'vue/dist/vue.js'
+        },
+    },
+})
+    .js('resources/js/app.js', 'public/js')
     .js('resources/js/vue.js', 'public/js')
     .js('resources/js/reg.js', 'public/js')
     .js('resources/js/chart.js', 'public/js')
     .js('resources/js/edit_rate.js', 'public/js')
+    .js('resources/js/add_post.js', 'public/js')
     // .js('resources/js/forum.js', 'public/js')
     .sass('resources/sass/chart.scss', 'public/css')
     .sass('resources/sass/edit.scss', 'public/css')

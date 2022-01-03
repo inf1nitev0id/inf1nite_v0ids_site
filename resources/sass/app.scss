@@ -81,3 +81,32 @@ table {
 [v-cloak] {
     display: none;
 }
+
+div.file-input {
+    display: flex;
+    flex-direction: column;
+
+    input[type="file"] {
+        display: none;
+    }
+
+    div.btn-group {
+        margin-top: 10px;
+
+        button {
+            height: 38px;
+            width: 38px;
+            padding: 2px;
+
+            & > img {
+                height: 100%;
+                width: 100%;
+                object-fit: contain;
+            }
+        }
+
+        input[type="text"] {
+            z-index: 1;
+        }
+    }
+}
