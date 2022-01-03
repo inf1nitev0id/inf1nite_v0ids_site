@@ -38,11 +38,9 @@
   from {
     box-shadow: 0 0 10px gray;
   }
-
   90% {
     box-shadow: 0 0 10px gray;
   }
-
   to {
     box-shadow: 0;
   }
@@ -52,16 +50,13 @@
   from {
     box-shadow: 0 0 10px gray;
   }
-
   90% {
     box-shadow: 0 0 10px gray;
   }
-
   to {
     box-shadow: 0;
   }
 }
-
 .rating {
   line-height: 1;
 }
@@ -69,4 +64,3 @@
 .red {
   color: #FF0000;
 }
-

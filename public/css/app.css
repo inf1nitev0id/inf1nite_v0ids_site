@@ -20,7 +20,6 @@ form {
   max-width: 350px;
   text-align: left;
 }
-
 form .form-group {
   margin-right: auto;
 }
@@ -37,21 +36,16 @@ form .form-group {
   justify-content: center;
 }
 
-table td,
-table th {
+table td, table th {
   padding-left: 5px;
   padding-right: 5px;
 }
-
-table.rating td:not(:last-child),
-table.rating th:not(:last-child) {
+table.rating td:not(:last-child), table.rating th:not(:last-child) {
   border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
-
 table.rating tr:not(:first-child):nth-child(odd) {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
-
 table.rating tr:not(:first-child):nth-child(even) {
   border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
@@ -71,4 +65,3 @@ table.rating tr:not(:first-child):nth-child(even) {
 [v-cloak] {
   display: none;
 }
-
