@@ -1,7 +1,6 @@
 table input {
   width: 80px;
 }
-
 table .header {
   position: -webkit-sticky;
   position: sticky;
@@ -9,7 +8,6 @@ table .header {
   background-color: white;
   z-index: 100;
 }
-
 table .btn {
   width: 100%;
 }
@@ -23,7 +21,6 @@ table .btn {
 form {
   max-width: none;
 }
-
 form:not(:first-child) {
   margin-top: 30px;
 }
@@ -46,4 +43,3 @@ img {
   position: relative;
   margin-left: 0;
 }
-

@@ -1,77 +1,83 @@
 body {
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
-	margin: 0;
-	padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 .logo {
-	width: 32px;
-	height: 32px;
+    width: 32px;
+    height: 32px;
 }
 
 ul > li {
-	list-style-type: none;
+    list-style-type: none;
 }
 
 form {
-	width: 100%;
-	max-width: 350px;
-	text-align: left;
+    width: 100%;
+    text-align: left;
 
-	.form-group {
-		margin-right: auto;
-	}
+    .form-group {
+        margin-right: auto;
+    }
 }
-.form-login {
-	margin: 0 auto;
+
+form.form-login {
+    max-width: 350px;
+    margin: 0 auto;
 }
 
 .form-center {
-	display: -ms-flexbox;
-	display: -webkit-box;
-	display: flex;
-	-ms-flex-align: center;
-	-ms-flex-pack: center;
-	-webkit-box-align: center;
-	align-items: center;
-	-webkit-box-pack: center;
-	justify-content: center;
+    display: -ms-flexbox;
+    display: -webkit-box;
+    display: flex;
+    -ms-flex-align: center;
+    -ms-flex-pack: center;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
 }
 
 table {
-	td, th {
-		padding-left: 5px;
-		padding-right: 5px;
-	}
-	&.rating {
-		td, th {
-			&:not(:last-child) {
-				border-right: 1px solid rgba(0, 0, 0, 0.2);
-			}
-		}
-		tr:not(:first-child) {
-			&:nth-child(odd) {
-				border-top: 1px solid rgba(0, 0, 0, 0.1);
-			}
-			&:nth-child(even) {
-				border-top: 1px solid rgba(0, 0, 0, 0.2);
-			}
-		}
-	}
+    td, th {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    &.rating {
+        td, th {
+            &:not(:last-child) {
+                border-right: 1px solid rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        tr:not(:first-child) {
+            &:nth-child(odd) {
+                border-top: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            &:nth-child(even) {
+                border-top: 1px solid rgba(0, 0, 0, 0.2);
+            }
+        }
+    }
 }
 
 .mini-btn {
-	flex: 0 !important;
+    flex: 0 !important;
 }
 
 .icon-btn {
-	width: 42px !important;
+    width: 42px !important;
 }
 
 .overflow {
-	overflow-x: auto;
+    overflow-x: auto;
 }
 
-[v-cloak] { display: none; }
+[v-cloak] {
+    display: none;
+}

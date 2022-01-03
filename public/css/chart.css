@@ -3,52 +3,43 @@ svg polyline.line {
   stroke-width: 2;
   fill: none;
 }
-
 svg polyline.line:hover {
   stroke-width: 4;
 }
-
 svg polyline.line.selected {
   stroke-width: 4;
   -webkit-animation: selected 2s infinite linear;
           animation: selected 2s infinite linear;
 }
-
 svg g.chart-grid line {
   fill: none;
   stroke-width: 1;
   stroke: #DDD;
   pointer-events: none;
 }
-
 svg text.rate-text {
   pointer-events: none;
   fill: #444;
   font-size: 10px;
 }
-
 svg text.rate-text-border {
   pointer-events: none;
   stroke-width: 1.5;
   stroke: #DDD;
   font-size: 10px;
 }
-
 svg text.event {
   cursor: pointer;
   font-size: 10px;
 }
-
 svg text.event.important {
   font-weight: bold;
 }
-
 svg line.event {
   opacity: 40%;
   stroke-width: 2;
   pointer-events: none;
 }
-
 svg line.event.important {
   stroke-width: 4;
 }
@@ -64,7 +55,6 @@ svg line.event.important {
     stroke: #EEE;
   }
 }
-
 .overflow {
   border-left: 1px solid #DDD;
   border-right: 1px solid #DDD;
@@ -93,7 +83,6 @@ svg line.event.important {
   width: 90%;
   max-width: 400px;
 }
-
 .modal-window p {
   text-align: center;
 }
@@ -107,4 +96,3 @@ svg line.event.important {
   background-color: #000000;
   opacity: 50%;
 }
-

@@ -1,51 +1,52 @@
 .comment_box {
-	width: 100%;
-	padding-top: 10px;
+    width: 100%;
+    padding-top: 10px;
 }
-.comment_box>.comment_box {
-	padding-left: 20px;
+
+.comment_box > .comment_box {
+    padding-left: 20px;
 }
 
 .comment {
-	padding: 5px;
-	border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .comment-header {
-	border-bottom: 0;
+    border-bottom: 0;
 }
 
 .comment-body {
-	word-break: break-all;
+    word-break: break-all;
 }
 
 .comment-footer {
-	border-top: 0;
-	padding: 0;
+    border-top: 0;
+    padding: 0;
 }
 
 .highlight {
-	animation-name: highlight;
-	animation-duration: 5s;
-	animation-iteration-count: 1;
+    animation-name: highlight;
+    animation-duration: 5s;
+    animation-iteration-count: 1;
 }
 
 @keyframes highlight {
-	from {
-		box-shadow: 0 0 10px gray;
-	}
-	90% {
-		box-shadow: 0 0 10px gray;
-	}
-	to {
-		box-shadow: 0;
-	}
+    from {
+        box-shadow: 0 0 10px gray;
+    }
+    90% {
+        box-shadow: 0 0 10px gray;
+    }
+    to {
+        box-shadow: none;
+    }
 }
 
 .rating {
-	line-height: 1;
+    line-height: 1;
 }
 
 .red {
-	color: #FF0000;
+    color: #FF0000;
 }

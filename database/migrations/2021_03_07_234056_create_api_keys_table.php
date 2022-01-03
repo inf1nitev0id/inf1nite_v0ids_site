@@ -4,20 +4,21 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateApiKeysTable extends Migration
-{
+class CreateApiKeysTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
-        Schema::create('api_keys', function (Blueprint $table) {
-            $table->id();
-						$table->string('name', 50)->unique();
-						$table->string('key', 255);
-        });
+    public function up() {
+        Schema::create(
+            'api_keys',
+            function(Blueprint $table) {
+                $table->id();
+                $table->string('name', 50)->unique();
+                $table->string('key', 255);
+            }
+        );
     }
 
     /**
@@ -25,8 +26,7 @@ class CreateApiKeysTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('api_keys');
     }
 }

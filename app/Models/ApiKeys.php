@@ -4,15 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
-class ApiKeys extends Model
-{
-	use HasFactory;
+/**
+ * @property int    $id
+ * @property string $name
+ * @property string $key
+ *
+ * @mixin Builder
+ */
+class ApiKeys extends Model {
+    use HasFactory;
 
-	public $timestamps = false;
+    public $timestamps = false;
 
-	public static function getKeyString($name) {
-		$result = ApiKeys::select('key')->where('name', '=', $name)->first();
-		return $result ? $result->key : null;
-	}
+    /**
+     * @param $name
+     *
+     * @return mixed|string|null
+     */
+    public static function getKeyString($name) {
+        $result = ApiKeys::select('key')
+            ->where(
+                'name',
+                '=',
+                $name
+            )
+            ->first();
+        return $result?->key;
+    }
 }

@@ -4,49 +4,148 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
-class MahoukaServerRating extends Model
-{
-	use HasFactory;
+/**
+ * @property int               $id
+ * @property int               $user_id
+ * @property int               $rate
+ * @property string            $date
+ * @property bool              $time
+ *
+ * @property MahoukaServerUser $user
+ *
+ * @mixin Builder
+ */
+class MahoukaServerRating extends Model {
+    use HasFactory;
 
-	public $timestamps = false;
+    public $timestamps = false;
 
-// получение рейтинга пользователя
-	public static function getUserRatingArray($user_id) {
-		$query = MahoukaServerRating::select('date', 'time', 'rate')
-			->where('user_id', '=', $user_id)
-			->orderBy('date', 'asc')
-			->orderBy('time', 'asc')
-			->get();
-		$result = [];
-		if ($join_date = MahoukaServerUser::find($user_id)->join_date)
-			$result[$join_date][0] = 0;
-		foreach ($query as $row) {
-			$result[$row->date][$row->time] = $row->rate;
-		}
-		return $result;
-	}
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
+        return $this->belongsTo('MahoukaServerUser');
+    }
 
-// получение наименьшей указанной даты в рейтинге
-	public static function getMinDate() {
-		$join = MahoukaServerUser::select('join_date')->where('join_date', '<>', null)->orderBy('join_date', 'asc')->first()->join_date;
-		$rate = MahoukaServerRating::select('date')->orderBy('date', 'asc')->first()->date;
-		return min($join, $rate);
-	}
+    /**
+     * Получение рейтинга пользователя
+     *
+     * @param $user_id
+     *
+     * @return array
+     */
+    public static function getUserRatingArray($user_id): array {
+        $query  = MahoukaServerRating::select(
+            'date',
+            'time',
+            'rate'
+        )
+            ->where(
+                'user_id',
+                '=',
+                $user_id
+            )
+            ->orderBy(
+                'date',
+                'asc'
+            )
+            ->orderBy(
+                'time',
+                'asc'
+            )
+            ->get();
+        $result = [];
+        if ($join_date = MahoukaServerUser::find($user_id)->join_date) {
+            $result[$join_date][0] = 0;
+        }
+        foreach ($query as $row) {
+            $result[$row->date][$row->time] = $row->rate;
+        }
+        return $result;
+    }
 
-// получение наибольшей указанной даты в рейтинге
-	public static function getMaxDate() {
-		$join = MahoukaServerUser::select('join_date')->where('join_date', '<>', null)->orderBy('join_date', 'desc')->first()->join_date;
-		$rate = MahoukaServerRating::select('date')->orderBy('date', 'desc')->first()->date;
-		return max($join, $rate);
-	}
+    /**
+     * Получение наименьшей указанной даты в рейтинге
+     *
+     * @return string
+     */
+    public static function getMinDate(): string {
+        $join = MahoukaServerUser::select('join_date')
+            ->where(
+                'join_date',
+                '<>',
+                null
+            )
+            ->orderBy(
+                'join_date',
+                'asc'
+            )
+            ->first()->join_date;
+        $rate = MahoukaServerRating::select('date')
+            ->orderBy(
+                'date',
+                'asc'
+            )
+            ->first()->date;
+        return min(
+            $join,
+            $rate
+        );
+    }
 
-// получение даты и времени последнего записанного рейтинга
-	public static function getLastRate() {
-		$query = MahoukaServerRating::select('date', 'time')->orderBy('date', 'desc')->orderBy('time', 'desc')->first();
-		return $query ? [
-			'date' => $query->date,
-			'time' => $query->time,
-		] : null;
-	}
+    /**
+     * Получение наибольшей указанной даты в рейтинге
+     *
+     * @return string
+     */
+    public static function getMaxDate(): string {
+        $join = MahoukaServerUser::select('join_date')
+            ->where(
+                'join_date',
+                '<>',
+                null
+            )
+            ->orderBy(
+                'join_date',
+                'desc'
+            )
+            ->first()->join_date;
+        $rate = MahoukaServerRating::select('date')
+            ->orderBy(
+                'date',
+                'desc'
+            )
+            ->first()->date;
+        return max(
+            $join,
+            $rate
+        );
+    }
+
+    /**
+     * Получение даты и времени последнего записанного рейтинга
+     *
+     * @return array|null
+     */
+    public static function getLastRate(): ?array {
+        $query = MahoukaServerRating::select(
+            'date',
+            'time'
+        )
+            ->orderBy(
+                'date',
+                'desc'
+            )
+            ->orderBy(
+                'time',
+                'desc'
+            )
+            ->first();
+        return $query ? [
+            'date' => $query->date,
+            'time' => $query->time,
+        ] : null;
+    }
 }
