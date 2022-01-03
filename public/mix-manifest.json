@@ -1,12 +1,12 @@
 {
     "/js/app.js": "/js/app.js",
-    "/js/vue.js": "/js/vue.js",
-    "/js/reg.js": "/js/reg.js",
+    "/css/chart.css": "/css/chart.css",
+    "/css/edit.css": "/css/edit.css",
+    "/css/mahouka.css": "/css/mahouka.css",
+    "/css/forum.css": "/css/forum.css",
+    "/css/app.css": "/css/app.css",
     "/js/chart.js": "/js/chart.js",
     "/js/edit_rate.js": "/js/edit_rate.js",
-    "/css/app.css": "/css/app.css",
-    "/css/forum.css": "/css/forum.css",
-    "/css/mahouka.css": "/css/mahouka.css",
-    "/css/edit.css": "/css/edit.css",
-    "/css/chart.css": "/css/chart.css"
+    "/js/reg.js": "/js/reg.js",
+    "/js/vue.js": "/js/vue.js"
 }
