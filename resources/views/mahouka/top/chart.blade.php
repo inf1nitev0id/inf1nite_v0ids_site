@@ -24,7 +24,7 @@
     <h5 id="page-title">Статистика сервера <a href="{{ route('mahouka.top.table') }}">Таблица</a></h5>
     <div id="chart">
         <p v-if="false">Для работы этой страницы необходим JS, если вы видете эту надпись, значит он не работает в вашем
-            браузере.</p>
+            браузере (ну или что-то сломалось, но такого же не бывает)</p>
         <div v-cloak style="position: relative;">
             {{-- подписи шкала рейтинга --}}
             <div v-for="y in horizontalDivisions" class="axis-text"
