@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ForumController;
 use App\Http\Controllers\MahoukaServerRatingController;
@@ -26,9 +27,7 @@ Route::get(
     ->name('home');
 Route::get(
     '/about',
-    function() {
-        return view('about');
-    }
+    [SiteController::class, 'about']
 )
     ->name('about');
 

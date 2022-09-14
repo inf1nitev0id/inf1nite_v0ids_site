@@ -4,25 +4,14 @@
     <option name="ANALYZE_TEST_SOURCES" value="false" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b24b4f8e-d70b-4345-8a3a-7532818dac55" name="New changelist" comment="Сделал сокрытие пунктов бокового меню.">
+    <list default="true" id="b24b4f8e-d70b-4345-8a3a-7532818dac55" name="New changelist" comment="Исправил ошибку, из-за которой не работал график рейтинга.">
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/SiteController.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Models/Contact.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/database/migrations/2022_09_14_220747_create_contacts_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/app.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/app.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/chart.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/chart.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/edit.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/edit.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/forum.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/forum.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/css/mahouka.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/css/mahouka.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/chart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/edit_rate.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/edit_rate.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/js/reg.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/reg.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/js/vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/js/vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/mix-manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/mix-manifest.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/chart.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/chart.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/js/vue.js" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/mahouka/top/chart.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/mahouka/top/chart.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.mix.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.mix.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/about.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/about.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <list id="bcd797fe-21f4-43a3-808c-1b68424db032" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/public/.htaccess" beforeDir="false" afterPath="$PROJECT_DIR$/public/.htaccess" afterDir="false" />
@@ -196,7 +185,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.JavaScript" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.PHP" />
     <property name="settings.editor.splitter.proportion" value="0.20795107" />
     <property name="sql.codeStylePanel.last.previewDialect" value="MySQL" />
     <property name="vue.rearranger.settings.migration" value="true" />
@@ -243,6 +232,7 @@
       <workItem from="1641576313430" duration="491000" />
       <workItem from="1644696822989" duration="688000" />
       <workItem from="1644746145116" duration="1027000" />
+      <workItem from="1663178470023" duration="4980000" />
     </task>
     <task id="LOCAL-00001" summary="Реформат кода.">
       <created>1640933168459</created>

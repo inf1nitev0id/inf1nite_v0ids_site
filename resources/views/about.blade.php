@@ -5,8 +5,8 @@
 @section('content')
     <h5>О сайте</h5>
     <p>
-        Данный сайт я написал для ознакомления с технологиями для создания веб-сайтов. Для создания сайта в том виде, в
-        каком он есть сейчас, были использованы:
+        Данный сайт я написал для ознакомления с технологиями для создания веб-сайтов.
+        Для создания сайта в том виде, в каком он есть сейчас, были использованы:
     </p>
     <ul>
         <li><i class="fab fa-html5"></i> HTML <small class="text-muted">я знаю, это неожиданно</small></li>
@@ -20,9 +20,27 @@
         <li><i class="fab fa-js"></i> JQuery</li>
         <li><i class="fab fa-vuejs"></i> Vue.js</li>
     </ul>
-    <h5>Контакты</h5>
-    <ul>
-        <li><i class="fas fa-envelope"></i> <a href="mailto:inf1nitev0id@yandex.ru">inf1nitev0id@yandex.ru</a></li>
-        <li><i class="fab fa-discord"></i> inf1nite_v0id#1002</li>
-    </ul>
+    @if($contacts)
+        <h5>Контакты</h5>
+        <ul>
+            @foreach($contacts as $contact)
+                <li>
+                    <i class="
+                        @switch($contact->type)
+                            @case('discord')
+                                fab fa-discord
+                                @break
+                            @default
+                                fas fa-envelope
+                            @endswitch
+                    "></i>
+                    @if($contact->link)
+                        <a href="{{$contact->link}}">{{$contact->content}}</a>
+                    @else
+                        {{$contact->content}}
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+    @endif
 @endsection
