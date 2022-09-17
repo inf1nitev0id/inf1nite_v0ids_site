@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands;
 
+use App\Classes\DiscordMessage;
 use Illuminate\Console\Command;
 use App\Models\MahoukaServerUser;
 use App\Models\MahoukaServerRating;
 use App\Models\ApiKeys;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 
 class sendWebhook extends Command {
     /**
@@ -42,68 +45,70 @@ class sendWebhook extends Command {
      * @return int
      */
     public function handle(): int {
-        $users      = MahoukaServerUser::getSortedUsers(
-            null,
-            false,
-            true
-        );
-        $lastRate   = MahoukaServerRating::getLastRate();
-        $hookObject = [
-            'username' => "Хлебозаменитель",
-            'content'  => ($lastRate['time'] ? "Вечерний" : "Утренний")." рейтинг ".$lastRate['date'],
-            'tts'      => false,
-        ];
-        $string     = "";
-        $title      = "";
-        $count      = 1;
-        $i          = 1;
-        foreach ($users as $user) {
-            if ($user['rate']) {
-                $username = str_replace(
-                    $this->chars['original'],
-                    $this->chars['replace'],
-                    $user['name']
-                );
-                $row      = $i++.".	**".$username."** - ".$user['rate']."\n";
-                if (strlen($string) + strlen($row) >= 2048) {
-                    if ($count == 1) {
-                        $title = "Часть $count";
-                    }
-                    $hookObject['embeds'][] = [
-                        'title'       => $title,
-                        'description' => $string,
-                        'type'        => "rich",
-                        'color'       => hexdec("FFFFFF"),
-                    ];
-                    $title                  = "Часть ".++$count;
-                    $string                 = "";
-                }
-                $string .= $row;
-            }
-        }
-        $hookObject['embeds'][] = [
-            'title'       => $title,
-            'description' => $string,
-            'type'        => "rich",
-            'color'       => hexdec("FFFFFF"),
-        ];
-        // $url = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('test-server-webhook');
-        $url     = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('mahouka-bot-channel-webhook');
-        $opts    = [
-            'http' => [
-                'method'  => 'POST',
-                'header'  => 'Content-Type: application/json',
-                'content' => json_encode($hookObject),
-            ],
-        ];
-        $context = stream_context_create($opts);
-        $this->info(
-            file_get_contents(
-                $url,
-                false,
-                $context
-            )
-        );
+        $lastRateDate = MahoukaServerRating::getLastRate();
+		$rating = MahoukaServerRating::where('date', '=', $lastRateDate['date'])
+			->where('time', '=', $lastRateDate['time'])
+			->orderBy('rate', 'DESC')->get();
+		$ratingStrings = [];
+		foreach ($rating as $key => $rate) {
+			$username = str_replace(
+				$this->chars['original'],
+				$this->chars['replace'],
+				$rate->user->name
+			);
+			$ratingStrings[] = ($key + 1).". **$username** - $rate->rate";
+		}
+
+		$prevRateDate = MahoukaServerRating
+			::where(DB::raw("CONCAT(date, ' ', time)"), '<', $lastRateDate['date'].' '.$lastRateDate['time'])
+			->orderBy('date', 'DESC')->orderBy('time', 'DESC')->first();
+		$prevRating = MahoukaServerRating::where('date', '=', $prevRateDate['date'])
+			->where('time', '=', $prevRateDate['time'])->get();
+		$prevRatingArray = [];
+		foreach ($prevRating as $rate) {
+			$prevRatingArray[$rate->user->id] = $rate;
+		}
+		$changes = [];
+		foreach ($rating as $rate) {
+			$diff = $rate->rate - (isset($prevRatingArray[$rate->user->id]) ? $prevRatingArray[$rate->user->id]->rate : 0);
+			unset($prevRatingArray[$rate->user->id]);
+			if ($diff) {
+				$changes[] = [
+					'name' => $rate->user->name,
+					'diff' => $diff,
+				];
+			}
+		}
+		foreach ($prevRatingArray as $rate) {
+			$changes[] = [
+				'name' => $rate->user->name,
+				'diff' => -$rate->rate,
+			];
+		}
+		usort($changes, static function ($a, $b) {
+			if ($a['diff'] === $b['diff']) {
+				return 0;
+			} else {
+				return $a['diff'] < $b['diff'] ? 1 : -1;
+			}
+		});
+		$changesStrings = [];
+		foreach ($changes as $key => $change) {
+			$diff = ($change['diff'] > 0 ? '+' : '').$change['diff'];
+			$changesStrings[] = ($key + 1).". **{$change['name']}** - $diff";
+		}
+
+		$message = new DiscordMessage();
+		$message->username = 'Хлебозаменитель';
+		$message->content = ($lastRateDate['time'] ? "Вечерний" : "Утренний")." рейтинг ".$lastRateDate['date'];
+		$message->setBigEmbedText(implode("\n", $ratingStrings));
+		$message->setEmbedColor(0xFFFFFF);
+		$key = ApiKeys::getKeyString('mahouka-bot-channel-webhook');
+		$message->sendWebhook($key);
+		$message->content = "Изменения в рейтинге";
+		$message->setBigEmbedText(implode("\n", $changesStrings));
+		$message->setEmbedColor(0x88FF88);
+		$message->sendWebhook($key);
         return 0;
     }
 }

@@ -26,7 +26,7 @@ class MahoukaServerRating extends Model {
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo {
-        return $this->belongsTo('MahoukaServerUser');
+        return $this->belongsTo(MahoukaServerUser::class);
     }
 
     /**

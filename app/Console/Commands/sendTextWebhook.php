@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Classes\DiscordMessage;
 use Illuminate\Console\Command;
 use App\Models\ApiKeys;
+use Illuminate\Support\Facades\App;
 
 class sendTextWebhook extends Command {
     /**
@@ -35,28 +37,10 @@ class sendTextWebhook extends Command {
      * @return int
      */
     public function handle(): int {
-        $url        = "https://canary.discord.com/api/webhooks/".ApiKeys::getKeyString('mahouka-bot-channel-webhook');
-        $hookObject = [
-            "content" => "".$this->argument('text'),
-            "tts"     => false,
-        ];
-        $postdata   = json_encode($hookObject);
-
-        $opts    = [
-            'http' => [
-                'method'  => 'POST',
-                'header'  => 'Content-Type: application/json',
-                'content' => $postdata,
-            ],
-        ];
-        $context = stream_context_create($opts);
-        $this->info(
-            file_get_contents(
-                $url,
-                false,
-                $context
-            )
-        );
+		$message = new DiscordMessage();
+		$message->setBigEmbedText($this->argument('text').' '.$this->argument('text'));
+		$message->content = $this->argument('text');
+		$message->sendWebhook(ApiKeys::getKeyString('mahouka-bot-channel-webhook'));
         return 0;
     }
 }
