@@ -105,10 +105,12 @@ class sendWebhook extends Command {
 		$message->setEmbedColor(0xFFFFFF);
 		$key = ApiKeys::getKeyString('mahouka-bot-channel-webhook');
 		$message->sendWebhook($key);
-		$message->content = "Изменения в рейтинге";
-		$message->setBigEmbedText(implode("\n", $changesStrings));
-		$message->setEmbedColor(0x88FF88);
-		$message->sendWebhook($key);
+		if ($changesStrings) {
+			$message->content = "Изменения в рейтинге";
+			$message->setBigEmbedText(implode("\n", $changesStrings));
+			$message->setEmbedColor(0x88FF88);
+			$message->sendWebhook($key);
+		}
         return 0;
     }
 }
